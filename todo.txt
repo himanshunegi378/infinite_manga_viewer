@@ -1,0 +1,2 @@
+next chapter manual button and errror control
+auto retry on image error
