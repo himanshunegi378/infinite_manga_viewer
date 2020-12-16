@@ -23,11 +23,15 @@ function MangaViewer(props: any) {
         .concat(`/${encodeURIComponent(link)}`),
     })
       .then((res) => {
-        setImageLinks((data: string[][]): any => {
-          const newData = [...data, [...res.data.imageList]];
-          return newData;
-        });
-        setNextChapterLink(res.data.nextChapterLink);
+        if (res.data.imageList.length > 0) {
+          setImageLinks((data: string[][]): any => {
+            const newData = [...data, [...res.data.imageList]];
+            return newData;
+          });
+          setNextChapterLink(res.data.nextChapterLink);
+        } else {
+          console.log("Unable to load next chapter");
+        }
       })
       .catch((err) =>
         console.log("Error while fetching chapter Image List: ", err)

@@ -17,7 +17,7 @@ function App(props: AppProps) {
         backgroundColor: "",
       }}
     >
-      <MangaLinkInput onLinkSubmitted={onLinkSubmitted}/>
+      <MangaLinkInput onLinkSubmitted={onLinkSubmitted} />
       <MangaViewer initialLink={initialLink} />
     </div>
   );
