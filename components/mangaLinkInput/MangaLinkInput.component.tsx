@@ -106,7 +106,6 @@ function MangaLinkInput(props: any) {
             <input
               className="w-full px-2 rounded-l-sm"
               type="text"
-              autoFocus={true}
               value={link}
               onChange={(e) => setLink(e.currentTarget.value)}
             />
@@ -135,6 +134,7 @@ function MangaLinkInput(props: any) {
           <form className="flex" onSubmit={onSubmit}>
             <input
               className="w-full px-2 rounded-l-sm"
+              autoFocus={true}
               type="text"
               value={link}
               onChange={(e) => setLink(e.currentTarget.value)}

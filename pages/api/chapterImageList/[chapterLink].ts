@@ -1,19 +1,25 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import MangaImageFetcherDirector from "../../../backendLibrary/MangaImagefetcher/Director";
-import MangaTxImageLinkBuilder from "../../../backendLibrary/MangaImagefetcher/MangaTxImageLinkBuilder";
+import MangaImageFetcherDirector from "../../../backendLibrary/MangaChapterInfofetcher/Director";
+import MangaTxChapterInfoBuilder from "../../../backendLibrary/MangaChapterInfofetcher/MangaTxChapterInfoBuilder";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     query: { chapterLink },
   } = req;
-  console.log("Current chapter: " + chapterLink);
-  const mangaImageFetchingDirector = new MangaImageFetcherDirector();
-  //@ts-ignore
-  const mangatxImageLinksBuilder = new MangaTxImageLinkBuilder(chapterLink);
-  await mangaImageFetchingDirector.construct(mangatxImageLinksBuilder);
-  const mangaImageLinkList = mangatxImageLinksBuilder.show().getImageLinks();
-  res.json({
-    imageList: mangaImageLinkList,
-    nextChapterLink: mangatxImageLinksBuilder.show().nextChapterLink,
-  });
+  try {
+    console.log("Current chapter: " + chapterLink);
+    const mangaImageFetchingDirector = new MangaImageFetcherDirector();
+    const mangatxImageLinksBuilder = new MangaTxChapterInfoBuilder(
+      chapterLink as string
+    );
+    await mangaImageFetchingDirector.construct(mangatxImageLinksBuilder);
+    const mangaChapterInfo = mangatxImageLinksBuilder.show();
+    res.json({
+      imageList: mangaChapterInfo.chapterImagesURL,
+      nextChapterLink: mangatxImageLinksBuilder.show().nextChapterURL,
+    });
+  } catch (error) {
+    console.log("Error get chapter info "+error)
+    return res.json({imageList:[],nextChapterLink:undefined})
+  }
 };

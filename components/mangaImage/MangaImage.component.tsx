@@ -1,4 +1,3 @@
-import Axios from "axios";
 import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import useOnScreen from "../../hooks/useOnScreen";
 
@@ -6,6 +5,9 @@ function MangaImage(props: any) {
   const { imageLink } = props;
   const [isActive, setIsActive] = useState(false);
   const [err, setErr] = useState(false);
+  const retryLimit = 3;
+  const NoOfTimesRetried = useRef(0);
+  const timeInterval = 500;
   const ref = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isVisible, disable] = useOnScreen(ref, window.innerHeight);
@@ -24,18 +26,24 @@ function MangaImage(props: any) {
   }, [isVisible, disable]);
 
   const onImageLoaded = () => {
-    //@ts-ignore
     ref.current.style.height = "auto";
   };
 
   const onError = (event: SyntheticEvent<HTMLImageElement, Event>) => {
-    setErr(true);
+    if (NoOfTimesRetried.current <= retryLimit) {
+      setTimeout(() => {
+        NoOfTimesRetried.current += 1;
+        retry();
+      }, timeInterval * NoOfTimesRetried.current);
+    } else {
+      setErr(true);
+    }
   };
 
   const retry = () => {
     setErr(false);
     if (!imageRef.current) return;
-    imageRef.current.src = "sfsf";
+    imageRef.current.src = "";
     imageRef.current.src = imageLink;
   };
 
@@ -47,8 +55,11 @@ function MangaImage(props: any) {
       }}
     >
       {err ? (
-        <div className=' flex flex-wrap justify-center content-center h-full'>
-          <button className="bg-blue-500 px-4 py-2 rounded-md font-semibold text-lg text-white" onClick={retry}>
+        <div className=" flex flex-wrap justify-center content-center h-full">
+          <button
+            className="bg-blue-500 px-4 py-2 rounded-md font-semibold text-lg text-white"
+            onClick={retry}
+          >
             Retry
           </button>
         </div>

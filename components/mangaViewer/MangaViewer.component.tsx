@@ -18,13 +18,11 @@ function MangaViewer(props: any) {
   const fetchChapterData = useCallback((link: string) => {
     Axios({
       method: "GET",
-      url: config.backendBaseUrl.concat("/api/chapterImageList").concat(`/${encodeURIComponent(link)}`),
-      // params: {
-      //   chapterLink: link,
-      // },
+      url: config.backendBaseUrl
+        .concat("/api/chapterImageList")
+        .concat(`/${encodeURIComponent(link)}`),
     })
       .then((res) => {
-        console.log(res.data);
         setImageLinks((data: string[][]): any => {
           const newData = [...data, [...res.data.imageList]];
           return newData;
@@ -37,6 +35,7 @@ function MangaViewer(props: any) {
   }, []);
 
   const onChapterFinished = useCallback(() => {
+    if (!nextChapterLink) return;
     fetchChapterData(nextChapterLink);
   }, [fetchChapterData, nextChapterLink]);
 
