@@ -11,6 +11,7 @@ import MangaImage from "../mangaImage/MangaImage.component";
 function MangaChapter(props: any) {
   const { imageLinks, onChapterFinished = () => {} } = props;
   const isActive = useRef(true);
+  const isLoading = useRef(false);
   const nextChapterRef = useRef<HTMLDivElement>(null);
   const [isVisible, disable] = useOnScreen(
     nextChapterRef,
@@ -18,13 +19,16 @@ function MangaChapter(props: any) {
   );
   const nextChapterLoadCommand = useCallback(async () => {
     if (!isActive.current) return;
+    if (isLoading.current) return;
 
-    const status = await onChapterFinished();
+    isLoading.current = true;
+    const isDone = await onChapterFinished();
     console.log(status);
-    if (status === "SUCCESS") {
+    if (isDone) {
       isActive.current = false;
       disable();
     }
+    isLoading.current = false
   }, [onChapterFinished]);
 
   useEffect(() => {
@@ -35,7 +39,7 @@ function MangaChapter(props: any) {
 
   const nextChapterButtonClicked = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
-     // nextChapterLoadCommand();
+      nextChapterLoadCommand();
     },
     [nextChapterLoadCommand]
   );

@@ -1,7 +1,38 @@
 import Axios from "axios";
+import { toUnicode } from "punycode";
 import React, { useCallback, useEffect, useState } from "react";
 import config from "../../config";
 import MangaChapter from "../mangaChapter/MangaChapter.component";
+
+const fetchChapterInfo = async (link: string): Promise<any> => {
+  try {
+    const response = await Axios({
+      method: "GET",
+      url: process.env.NEXT_PUBLIC_BACKEND_URL.concat(
+        "/api/chapterImageList"
+      ).concat(`/${encodeURIComponent(link)}`),
+    });
+    const responseData = response.data;
+    if (responseData.status === 1) {
+      if (responseData.code === "CHAPTER") {
+        return { code: "CHAPTER", data: responseData.payload };
+        // setImageLinks((data: string[][]): any => {
+        //   const newData = [...data, [...responseData.imageList]];
+        //   return newData;
+        // });
+        // setNextChapterLink(responseData.nextChapterLink);
+        // return "SUCCESS";
+      } else if (responseData.code === "COMPLETE") {
+        return { code: "COMPLETE" };
+      }
+    } else if (responseData.code === "ERROR") {
+      return { code: "ERROR" };
+    }
+  } catch (error) {
+    console.log("Error while fetching chapter data: " + error);
+    return { code: "ERROR" };
+  }
+};
 
 function MangaViewer(props: any) {
   const { initialLink = "" } = props;
@@ -11,41 +42,28 @@ function MangaViewer(props: any) {
   useEffect(() => {
     if (!initialLink) return;
     setImageLinks([]);
-    fetchChapterData(initialLink);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchChapterInfo(initialLink).then((info) => {
+      const { code, data } = info;
+      if (code === "CHAPTER") {
+        setImageLinks((prevState) => [...prevState, [...data.imageList]]);
+        setNextChapterLink(data.nextChapterLink);
+      }
+    });
   }, [initialLink]);
 
-  const fetchChapterData = useCallback(async (link: string): Promise<String> => {
-    try {
-      const response = await Axios({
-        method: "GET",
-        url: config.backendBaseUrl
-          .concat("/api/chapterImageList")
-          .concat(`/${encodeURIComponent(link)}`),
-      });
-      const responseData = response.data;
-      if (responseData.status === 1) {
-        if (responseData.code === "CHAPTER") {
-          setImageLinks((data: string[][]): any => {
-            const newData = [...data, [...responseData.imageList]];
-            return newData;
-          });
-          setNextChapterLink(responseData.nextChapterLink);
-          return "SUCCESS";
-        } else if (responseData.code === "COMPLETE") {
-          return "SUCCESS";
-        }
-      }
-    } catch (error) {
-      console.log("Error while fetching chapter data: " + error);
-      return "FAIL";
-    }
-  }, []);
+  const onChapterFinished = useCallback(async () => {
+    if (!nextChapterLink) return true;
 
-  const onChapterFinished = useCallback(async() => {
-    if (!nextChapterLink) return;
-    return fetchChapterData(nextChapterLink);
-  }, [fetchChapterData, nextChapterLink]);
+    const { code, data } = await fetchChapterInfo(nextChapterLink);
+    if (code === "CHAPTER") {
+      setImageLinks((prevState) => [...prevState, [...data.imageList]]);
+      setNextChapterLink(data.nextChapterLink);
+      return true;
+    }
+    if (code === "COMPLETE") return true;
+
+    return false;
+  }, [nextChapterLink]);
 
   return (
     <div
