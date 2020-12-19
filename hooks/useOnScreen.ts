@@ -53,7 +53,7 @@ export default function useOnScreen(ref: any, offset: number):[boolean,()=>void]
     };
     window.addEventListener("scroll", onScroll, true);
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      // window.removeEventListener("scroll", onScroll);
     };
   }, [checkVisbility, isDisabled, isVisible, offset, ref]);
 

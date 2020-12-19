@@ -19,16 +19,22 @@ function MangaChapter(props: any) {
 
   useEffect(() => {
     if (isVisible && isActive) {
-      onChapterFinished();
-      setIsActive(false);
+      const status = onChapterFinished();
+      if (status === "SUCCESS") {
+        setIsActive(false);
+        disable();
+      }
     }
   }, [isVisible, onChapterFinished, isActive]);
 
   const nextChapterButtonClicked = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       if (isActive) {
-        onChapterFinished();
-        setIsActive(false);
+        const status = onChapterFinished();
+        if (status === "SUCCESS") {
+          setIsActive(false);
+          disable();
+        }
       }
     },
     [isActive]

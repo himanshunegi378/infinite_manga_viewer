@@ -14,10 +14,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     );
     await mangaImageFetchingDirector.construct(mangatxImageLinksBuilder);
     const mangaChapterInfo = mangatxImageLinksBuilder.show();
+    if(mangaChapterInfo.chapterImagesURL.length<=0){
+      return res.json({
+        status:1,
+        code:'COMPLETE'
+      })
+    }
     return res.json({
       status: 1,
+      code:'CHAPTER',
       imageList: mangaChapterInfo.chapterImagesURL,
-      nextChapterLink: mangatxImageLinksBuilder.show().nextChapterURL,
+      nextChapterLink: mangaChapterInfo.nextChapterURL,
+      title:mangaChapterInfo.chapterTitle
     });
   } catch (error) {
     console.log("Error get chapter info " + error);

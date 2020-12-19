@@ -15,27 +15,31 @@ function MangaViewer(props: any) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialLink]);
 
-  const fetchChapterData = useCallback((link: string) => {
-    Axios({
-      method: "GET",
-      url: config.backendBaseUrl
-        .concat("/api/chapterImageList")
-        .concat(`/${encodeURIComponent(link)}`),
-    })
-      .then((res) => {
-        if (res.data.imageList.length > 0) {
+  const fetchChapterData = useCallback(async (link: string) => {
+    try {
+      const response = await Axios({
+        method: "GET",
+        url: config.backendBaseUrl
+          .concat("/api/chapterImageList")
+          .concat(`/${encodeURIComponent(link)}`),
+      });
+      const responseData = response.data;
+      if (responseData.status === 1) {
+        if (responseData.code === "CHAPTER") {
           setImageLinks((data: string[][]): any => {
-            const newData = [...data, [...res.data.imageList]];
+            const newData = [...data, [...responseData.imageList]];
             return newData;
           });
-          setNextChapterLink(res.data.nextChapterLink);
-        } else {
-          console.log("Unable to load next chapter");
+          setNextChapterLink(responseData.nextChapterLink);
+          return "SUCCESS";
+        } else if (responseData.code === "COMPLETE") {
+          return "SUCCESS";
         }
-      })
-      .catch((err) =>
-        console.log("Error while fetching chapter Image List: ", err)
-      );
+      }
+    } catch (error) {
+      console.log("Error while fetching chapter data: " + error);
+      return "FAIL";
+    }
   }, []);
 
   const onChapterFinished = useCallback(() => {
