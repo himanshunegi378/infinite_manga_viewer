@@ -1,5 +1,5 @@
 const config = {
-    backendBaseUrl: "http://192.168.0.7:3000",
+    backendBaseUrl: "https://infinite-manga-viewer.vercel.app/",
   };
   
   export default config;
