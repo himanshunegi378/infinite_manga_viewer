@@ -15,7 +15,7 @@ function MangaViewer(props: any) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialLink]);
 
-  const fetchChapterData = useCallback(async (link: string) => {
+  const fetchChapterData = useCallback(async (link: string): Promise<String> => {
     try {
       const response = await Axios({
         method: "GET",
@@ -42,9 +42,9 @@ function MangaViewer(props: any) {
     }
   }, []);
 
-  const onChapterFinished = useCallback(() => {
+  const onChapterFinished = useCallback(async() => {
     if (!nextChapterLink) return;
-    fetchChapterData(nextChapterLink);
+    return fetchChapterData(nextChapterLink);
   }, [fetchChapterData, nextChapterLink]);
 
   return (
