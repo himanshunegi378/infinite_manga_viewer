@@ -1,29 +1,28 @@
 import { useCallback, useEffect, useState } from "react";
 
-export default function useOnScreen(ref: any, offset: number):[boolean,()=>void] {
+const checkVisbility = (element: any, offset: number): boolean => {
+  const position = element.getBoundingClientRect();
+  if (
+    //@ts-ignore
+    (position.top - offset < window.innerHeight &&
+      position.top - offset >= 0) ||
+    //@ts-ignore
+    (position?.bottom + offset < window.innerHeight &&
+      position?.bottom + offset >= 0) ||
+    (position.top - offset < window.innerHeight &&
+      position.bottom + offset > window.innerHeight)
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+};
+export default function useOnScreen(
+  ref: any,
+  offset: number
+): [boolean, () => void] {
   const [isVisible, setIsVisible] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
-
-  const checkVisbility = useCallback(
-    (element: any, offset: number): boolean => {
-      const position = element.getBoundingClientRect();
-      if (
-        //@ts-ignore
-        (position.top - offset < window.innerHeight &&
-          position.top - offset >= 0) ||
-        //@ts-ignore
-        (position?.bottom + offset < window.innerHeight &&
-          position?.bottom + offset >= 0) ||
-        (position.top - offset < window.innerHeight &&
-          position.bottom + offset > window.innerHeight)
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    []
-  );
 
   useEffect(() => {
     if (checkVisbility(ref.current, offset)) {
@@ -31,7 +30,7 @@ export default function useOnScreen(ref: any, offset: number):[boolean,()=>void]
     } else {
       setIsVisible(false);
     }
-  }, [checkVisbility, offset, ref]);
+  }, [offset, ref]);
 
   useEffect(() => {
     if (isDisabled) {

@@ -33,7 +33,7 @@ function App(props: any) {
 export async function getServerSideProps(context) {
   return {
     props: {
-      chapterURL: context.query.chapterURL,
+      chapterURL: context.query.chapterURL||null,
     }, // will be passed to the page component as props
   };
 }
