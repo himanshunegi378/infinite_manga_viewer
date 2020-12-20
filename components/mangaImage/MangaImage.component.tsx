@@ -78,7 +78,7 @@ function MangaImage(props: any) {
           referrerPolicy="no-referrer"
           alt="l"
         />
-      ) : null}
+      ) : <img src='/loading.gif' width='128' height='128'/>}
     </div>
   );
 }
