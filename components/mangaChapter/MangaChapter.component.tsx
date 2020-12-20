@@ -23,7 +23,6 @@ function MangaChapter(props: any) {
 
     isLoading.current = true;
     const isDone = await onChapterFinished();
-    console.log(status);
     if (isDone) {
       isActive.current = false;
       disaleVisbilityDetection();

@@ -7,6 +7,12 @@ function App(props: any) {
   const { chapterURL = "" } = props;
   const [initialLink, setInitialLink] = useState(chapterURL);
 
+  useEffect(() => {
+    if(!chapterURL) return
+    setInitialLink(chapterURL)
+   
+  }, [chapterURL])
+
   const onLinkSubmitted = useCallback((link: string) => {
     setInitialLink(link);
   }, []);

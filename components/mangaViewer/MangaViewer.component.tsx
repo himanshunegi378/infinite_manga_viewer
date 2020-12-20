@@ -17,12 +17,6 @@ const fetchChapterInfo = async (link: string): Promise<any> => {
     if (responseData.status === 1) {
       if (responseData.code === "CHAPTER") {
         return { code: "CHAPTER", data: responseData.payload };
-        // setImageLinks((data: string[][]): any => {
-        //   const newData = [...data, [...responseData.imageList]];
-        //   return newData;
-        // });
-        // setNextChapterLink(responseData.nextChapterLink);
-        // return "SUCCESS";
       } else if (responseData.code === "COMPLETE") {
         return { code: "COMPLETE" };
       }
@@ -44,17 +38,18 @@ function MangaViewer(props: any) {
 
   useEffect(() => {
     if (!initialLink) return;
-    setImageLinks([]);
+    setNextChapterLink("")
     fetchChapterInfo(initialLink).then((info) => {
       const { code, data } = info;
       if (code === "CHAPTER") {
-        setImageLinks((prevState) => [...prevState, [...data.imageList]]);
+        setImageLinks((prevState) => [ [...data.imageList]]);
         setNextChapterLink(data.nextChapterLink);
         router.push(
           `/?chapterURL=${encodeURIComponent(initialLink)}`,
           undefined,
           { shallow: true }
         );
+        console.log('initial link ',initialLink);
       }
     });
   }, [initialLink]);
@@ -64,13 +59,15 @@ function MangaViewer(props: any) {
 
     const { code, data } = await fetchChapterInfo(nextChapterLink);
     if (code === "CHAPTER") {
-      setImageLinks((prevState) => [...prevState, [...data.imageList]]);
-      setNextChapterLink(data.nextChapterLink);
       router.push(
         `/?chapterURL=${encodeURIComponent(nextChapterLink)}`,
         undefined,
         { shallow: true }
       );
+      console.log('next chapter link ',nextChapterLink);
+
+      setImageLinks((prevState) => [...prevState, [...data.imageList]]);
+      setNextChapterLink(data.nextChapterLink);
 
       return true;
     }
