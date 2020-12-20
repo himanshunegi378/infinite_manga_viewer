@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import useEffectDebugger from "./useEffectDebug";
 
 const checkVisbility = (element: any, offset: number): boolean => {
   const position = element.getBoundingClientRect();
@@ -32,10 +33,7 @@ export default function useOnScreen(
     }
   }, [offset, ref]);
 
-  useEffect(() => {
-    if (isDisabled) {
-      return;
-    }
+  useEffectDebugger(() => {
     const onScroll = () => {
       if (!ref.current) {
         return;
@@ -50,11 +48,17 @@ export default function useOnScreen(
         }
       }
     };
+
+    if (isDisabled) {
+      window.removeEventListener("scroll", onScroll, true);
+      return;
+    }
+
     window.addEventListener("scroll", onScroll, true);
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll, true);
     };
-  }, [checkVisbility, isDisabled, isVisible, offset, ref]);
+  }, [isDisabled, isVisible, offset, ref]);
 
   const disable = useCallback((): void => {
     setIsDisabled(true);

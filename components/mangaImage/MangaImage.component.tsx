@@ -1,4 +1,5 @@
 import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
+import useEffectDebugger from "../../hooks/useEffectDebug";
 import useOnScreen from "../../hooks/useOnScreen";
 
 function MangaImage(props: any) {
@@ -14,6 +15,7 @@ function MangaImage(props: any) {
 
   useEffect(() => {
     let id: number | undefined = undefined;
+
     if (isVisible) {
       id = window.setTimeout(() => {
         setIsActive(true);
@@ -23,11 +25,22 @@ function MangaImage(props: any) {
     return () => {
       window.clearTimeout(id);
     };
-  }, [isVisible, disable]);
+  }, [isVisible,disable]);
 
   const onImageLoaded = () => {
     ref.current.style.height = "auto";
   };
+
+  useEffectDebugger(() => {
+    function onError(event) {
+      console.log(event.type);
+      console.log(event);
+    }
+    ref.current.addEventListener("error", onError);
+    return () => {
+      ref.current.removeEventListener("error", onError);
+    };
+  }, []);
 
   const onError = (event: SyntheticEvent<HTMLImageElement, Event>) => {
     if (NoOfTimesRetried.current <= retryLimit) {
