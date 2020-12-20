@@ -3,6 +3,7 @@ import { toUnicode } from "punycode";
 import React, { useCallback, useEffect, useState } from "react";
 import config from "../../config";
 import MangaChapter from "../mangaChapter/MangaChapter.component";
+import { useRouter } from "next/router";
 
 const fetchChapterInfo = async (link: string): Promise<any> => {
   try {
@@ -35,6 +36,8 @@ const fetchChapterInfo = async (link: string): Promise<any> => {
 };
 
 function MangaViewer(props: any) {
+  const router = useRouter();
+
   const { initialLink = "" } = props;
   const [imageLinks, setImageLinks] = useState<string[][]>([]);
   const [nextChapterLink, setNextChapterLink] = useState<string>("");
@@ -47,6 +50,11 @@ function MangaViewer(props: any) {
       if (code === "CHAPTER") {
         setImageLinks((prevState) => [...prevState, [...data.imageList]]);
         setNextChapterLink(data.nextChapterLink);
+        router.push(
+          `/?chapterURL=${encodeURIComponent(initialLink)}`,
+          undefined,
+          { shallow: true }
+        );
       }
     });
   }, [initialLink]);
@@ -58,6 +66,12 @@ function MangaViewer(props: any) {
     if (code === "CHAPTER") {
       setImageLinks((prevState) => [...prevState, [...data.imageList]]);
       setNextChapterLink(data.nextChapterLink);
+      router.push(
+        `/?chapterURL=${encodeURIComponent(nextChapterLink)}`,
+        undefined,
+        { shallow: true }
+      );
+
       return true;
     }
     if (code === "COMPLETE") return true;
