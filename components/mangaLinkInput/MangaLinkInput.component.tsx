@@ -13,6 +13,7 @@ function MangaLinkInput(props: any) {
   const [link, setLink] = useState("");
   const previousScrllTopRef = useRef(0);
   const hideableSearchBoxRef = useRef(null);
+  const yValue = useRef(0);
   const innerHideableSearchBoxRef = useRef(null);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -51,17 +52,20 @@ function MangaLinkInput(props: any) {
       //@ts-ignore
       const searchBoxHeight = innerHideableSearchBoxRef.current.getBoundingClientRect()
         .height;
-      const newTopValue: number =
-        Number(searchBox.style.top.slice(0, -2)) - offset;
       if (isNegative(offset)) {
-        searchBox.style.top =
-          (newTopValue > searchBoxHeight ? searchBoxHeight : newTopValue) +
-          "px";
         //move searchbox down
+        searchBox.style.transform = `translatey(${
+          yValue.current - offset > 0
+            ? (yValue.current = 0)
+            : yValue.current -= offset
+        }px)`;
       } else {
         //move searchbox up
-        searchBox.style.top =
-          (Math.sign(newTopValue) === -1 ? "0" : newTopValue.toString()) + "px";
+        searchBox.style.transform = `translatey(${
+          yValue.current - offset < searchBoxHeight * -1
+            ? (yValue.current = (searchBoxHeight * -1))
+            : yValue.current -= offset
+        }px)`;
       }
     },
     []

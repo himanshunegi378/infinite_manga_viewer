@@ -13,7 +13,7 @@ function MangaChapter(props: any) {
   const isActive = useRef(true);
   const isLoading = useRef(false);
   const nextChapterRef = useRef<HTMLDivElement>(null);
-  const [isVisible, disable] = useOnScreen(
+  const [isVisible, disaleVisbilityDetection] = useOnScreen(
     nextChapterRef,
     window.innerHeight * 4
   );
@@ -26,7 +26,7 @@ function MangaChapter(props: any) {
     console.log(status);
     if (isDone) {
       isActive.current = false;
-      disable();
+      disaleVisbilityDetection();
     }
     isLoading.current = false
   }, [onChapterFinished]);
