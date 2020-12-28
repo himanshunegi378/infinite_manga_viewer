@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import useEffectDebugger from "./useEffectDebug";
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { fromEvent, interval } from 'rxjs'
+import { throttle } from 'rxjs/operators'
 
 const checkVisbility = (element: any, offset: number): boolean => {
-  const position = element.getBoundingClientRect();
+  const position = element.getBoundingClientRect()
   if (
     //@ts-ignore
     (position.top - offset < window.innerHeight &&
@@ -13,56 +14,59 @@ const checkVisbility = (element: any, offset: number): boolean => {
     (position.top - offset < window.innerHeight &&
       position.bottom + offset > window.innerHeight)
   ) {
-    return true;
+    return true
   } else {
-    return false;
+    return false
   }
-};
+}
 export default function useOnScreen(
   ref: any,
-  offset: number
+  offset: number,
+  updateInterval:number = 100
 ): [boolean, () => void] {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false);
+  const [isVisible, setIsVisible] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(false)
+  const clickObservalbleRef = useRef(
+    fromEvent(window, 'scroll').pipe(throttle(ev => interval(updateInterval)))
+  )
 
   useEffect(() => {
     if (checkVisbility(ref.current, offset)) {
-      setIsVisible(true);
+      setIsVisible(true)
     } else {
-      setIsVisible(false);
+      setIsVisible(false)
     }
-  }, [offset, ref]);
+  }, [offset, ref])
 
-  useEffectDebugger(() => {
+  useEffect(() => {
+    if (isDisabled) return
+
     const onScroll = () => {
       if (!ref.current) {
-        return;
+        return
       }
       if (checkVisbility(ref.current, offset)) {
         if (!isVisible) {
-          setIsVisible(true);
+          setIsVisible(true)
         }
       } else {
         if (isVisible) {
-          setIsVisible(false);
+          setIsVisible(false)
         }
       }
-    };
-
-    if (isDisabled) {
-      window.removeEventListener("scroll", onScroll, true);
-      return;
     }
 
-    window.addEventListener("scroll", onScroll, true);
+    const scrollObserver = clickObservalbleRef.current.subscribe(() => {
+      onScroll()
+    })
     return () => {
-      window.removeEventListener("scroll", onScroll, true);
-    };
-  }, [isDisabled, isVisible, offset, ref]);
+      scrollObserver.unsubscribe()
+    }
+  }, [isDisabled, isVisible, offset, ref])
 
   const disable = useCallback((): void => {
-    setIsDisabled(true);
-  }, []);
+    setIsDisabled(true)
+  }, [])
 
-  return [isVisible, disable];
+  return [isVisible, disable]
 }

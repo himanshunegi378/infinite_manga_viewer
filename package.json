@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "format": "prettier --write \"./**/*.{js,ts}\""
   },
   "dependencies": {
     "autoprefixer": "^10.1.0",
@@ -16,13 +17,16 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-smooth-scrolling": "^1.0.2",
+    "rxjs": "^6.6.3",
     "swr": "^0.3.9",
     "tailwindcss": "^2.0.2"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.23",
     "@types/node": "^14.14.13",
+    "@types/prettier": "^2.1.6",
     "@types/react": "^17.0.0",
+    "prettier": "^2.2.1",
     "typescript": "^4.1.3"
   }
 }
