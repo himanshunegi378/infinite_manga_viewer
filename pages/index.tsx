@@ -1,21 +1,21 @@
-import { AppProps } from "next/app";
-import React, { useCallback, useEffect, useState } from "react";
-import MangaLinkInput from "../components/mangaLinkInput/MangaLinkInput.component";
-import MangaViewer from "../components/mangaViewer/MangaViewer.component";
-import useEffectDebugger from "../hooks/useEffectDebug";
+import { AppProps } from 'next/app'
+import React, { useCallback, useEffect, useState } from 'react'
+import MangaLinkInput from '../components/mangaLinkInput/MangaLinkInput.component'
+import MangaViewer from '../components/mangaViewer/MangaViewer.component'
+import useEffectDebugger from '../hooks/useEffectDebug'
 
 function App(props: any) {
-  const { chapterURL = "" } = props;
-  const [initialLink, setInitialLink] = useState(chapterURL);
+  const { chapterURL = '' } = props
+  const [initialLink, setInitialLink] = useState(chapterURL)
 
   useEffect(() => {
-    if (!chapterURL) return;
-    setInitialLink(chapterURL);
-  }, [chapterURL]);
+    if (!chapterURL) return
+    setInitialLink(chapterURL)
+  }, [chapterURL])
 
   const onLinkSubmitted = useCallback((link: string) => {
-    setInitialLink(link);
-  }, []);
+    setInitialLink(link)
+  }, [])
 
   // useEffectDebugger(() => {
   //   const onError = (event) => {
@@ -32,21 +32,21 @@ function App(props: any) {
     <div
       className="App"
       style={{
-        backgroundColor: "",
+        backgroundColor: ''
       }}
     >
       <MangaLinkInput onLinkSubmitted={onLinkSubmitted} />
       <MangaViewer initialLink={initialLink} />
     </div>
-  );
+  )
 }
 
 export async function getServerSideProps(context) {
   return {
     props: {
-      chapterURL: context.query.chapterURL || null,
-    }, // will be passed to the page component as props
-  };
+      chapterURL: context.query.chapterURL || null
+    } // will be passed to the page component as props
+  }
 }
 
-export default App;
+export default App

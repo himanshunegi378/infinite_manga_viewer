@@ -1,70 +1,70 @@
-import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
-import useEffectDebugger from "../../hooks/useEffectDebug";
-import useOnScreen from "../../hooks/useOnScreen";
+import React, { SyntheticEvent, useEffect, useRef, useState } from 'react'
+import useEffectDebugger from '../../hooks/useEffectDebug'
+import useOnScreen from '../../hooks/useOnScreen'
 
 function MangaImage(props: any) {
-  const { imageLink } = props;
-  const [isActive, setIsActive] = useState(false);
-  const [err, setErr] = useState(false);
-  const retryLimit = 3;
-  const NoOfTimesRetried = useRef(0);
-  const timeInterval = 500;
-  const ref = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const [isVisible, disable] = useOnScreen(ref, window.innerHeight);
+  const { imageLink } = props
+  const [isActive, setIsActive] = useState(false)
+  const [err, setErr] = useState(false)
+  const retryLimit = 3
+  const NoOfTimesRetried = useRef(0)
+  const timeInterval = 500
+  const ref = useRef<HTMLDivElement>(null)
+  const imageRef = useRef<HTMLImageElement>(null)
+  const [isVisible, disable] = useOnScreen(ref, window.innerHeight)
 
   useEffect(() => {
-    let id: number | undefined = undefined;
+    let id: number | undefined = undefined
 
     if (isVisible) {
       id = window.setTimeout(() => {
-        setIsActive(true);
-        disable();
-      }, 500);
+        setIsActive(true)
+        disable()
+      }, 500)
     }
     return () => {
-      window.clearTimeout(id);
-    };
-  }, [isVisible,disable]);
+      window.clearTimeout(id)
+    }
+  }, [isVisible, disable])
 
   const onImageLoaded = () => {
-    ref.current.style.height = "auto";
-  };
+    ref.current.style.height = 'auto'
+  }
 
   useEffectDebugger(() => {
     function onError(event) {
-      console.log(event.type);
-      console.log(event);
+      console.log(event.type)
+      console.log(event)
     }
-    ref.current.addEventListener("error", onError);
+    ref.current.addEventListener('error', onError)
     return () => {
-      ref.current.removeEventListener("error", onError);
-    };
-  }, []);
+      ref.current.removeEventListener('error', onError)
+    }
+  }, [])
 
   const onError = (event: SyntheticEvent<HTMLImageElement, Event>) => {
     if (NoOfTimesRetried.current <= retryLimit) {
       setTimeout(() => {
-        NoOfTimesRetried.current += 1;
-        retry();
-      }, timeInterval * NoOfTimesRetried.current);
+        NoOfTimesRetried.current += 1
+        retry()
+      }, timeInterval * NoOfTimesRetried.current)
     } else {
-      setErr(true);
+      setErr(true)
     }
-  };
+  }
 
   const retry = () => {
-    setErr(false);
-    if (!imageRef.current) return;
-    imageRef.current.src = "";
-    imageRef.current.src = imageLink;
-  };
+    setErr(false)
+    if (!imageRef.current) return
+    imageRef.current.src = ''
+    imageRef.current.src = imageLink
+  }
 
   return (
     <div
       ref={ref}
       style={{
-        height: "500px",
+        height: '500px'
       }}
     >
       {err ? (
@@ -81,9 +81,9 @@ function MangaImage(props: any) {
         <img
           ref={imageRef}
           style={{
-            verticalAlign: "bottom",
-            width: "100%",
-            height: "auto",
+            verticalAlign: 'bottom',
+            width: '100%',
+            height: 'auto'
           }}
           src={imageLink}
           onLoad={onImageLoaded}
@@ -91,9 +91,11 @@ function MangaImage(props: any) {
           referrerPolicy="no-referrer"
           alt="l"
         />
-      ) : <img src='/loading.gif' width='128' height='128'/>}
+      ) : (
+        <img src="/loading.gif" width="128" height="128" />
+      )}
     </div>
-  );
+  )
 }
 
-export default MangaImage;
+export default MangaImage

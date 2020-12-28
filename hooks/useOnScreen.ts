@@ -22,7 +22,7 @@ const checkVisbility = (element: any, offset: number): boolean => {
 export default function useOnScreen(
   ref: any,
   offset: number,
-  updateInterval:number = 100
+  updateInterval: number = 100
 ): [boolean, () => void] {
   const [isVisible, setIsVisible] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)

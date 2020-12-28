@@ -3,57 +3,57 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState,
-} from "react";
-import useOnScreen from "../../hooks/useOnScreen";
-import MangaImage from "../mangaImage/MangaImage.component";
+  useState
+} from 'react'
+import useOnScreen from '../../hooks/useOnScreen'
+import MangaImage from '../mangaImage/MangaImage.component'
 
 function MangaChapter(props: any) {
-  const { imageLinks, onChapterFinished = () => {} } = props;
-  const isActive = useRef(true);
-  const isLoading = useRef(false);
-  const nextChapterRef = useRef<HTMLDivElement>(null);
+  const { imageLinks, onChapterFinished = () => {} } = props
+  const isActive = useRef(true)
+  const isLoading = useRef(false)
+  const nextChapterRef = useRef<HTMLDivElement>(null)
   const [isVisible, disaleVisbilityDetection] = useOnScreen(
     nextChapterRef,
     window.innerHeight * 4
-  );
+  )
   const nextChapterLoadCommand = useCallback(async () => {
-    if (!isActive.current) return;
-    if (isLoading.current) return;
+    if (!isActive.current) return
+    if (isLoading.current) return
 
-    isLoading.current = true;
-    const isDone = await onChapterFinished();
+    isLoading.current = true
+    const isDone = await onChapterFinished()
     if (isDone) {
-      isActive.current = false;
-      disaleVisbilityDetection();
+      isActive.current = false
+      disaleVisbilityDetection()
     }
     isLoading.current = false
-  }, [onChapterFinished]);
+  }, [onChapterFinished])
 
   useEffect(() => {
     if (isVisible) {
-      nextChapterLoadCommand();
+      nextChapterLoadCommand()
     }
-  }, [isVisible, nextChapterLoadCommand]);
+  }, [isVisible, nextChapterLoadCommand])
 
   const nextChapterButtonClicked = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
-      nextChapterLoadCommand();
+      nextChapterLoadCommand()
     },
     [nextChapterLoadCommand]
-  );
+  )
 
   return (
     <>
       {imageLinks.map((link: string, index: number) => {
-        return <MangaImage key={index} imageLink={link} />;
+        return <MangaImage key={index} imageLink={link} />
       })}
       <div
         className="text-center"
         ref={nextChapterRef}
         style={{
-          fontSize: "2rem",
-          padding: "1rem",
+          fontSize: '2rem',
+          padding: '1rem'
         }}
       >
         <button
@@ -64,7 +64,7 @@ function MangaChapter(props: any) {
         </button>
       </div>
     </>
-  );
+  )
 }
 
-export default MangaChapter;
+export default MangaChapter
