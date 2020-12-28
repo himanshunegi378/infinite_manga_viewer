@@ -80,8 +80,7 @@ function MangaViewer(props: any) {
     <div
       style={{
         backgroundColor: ''
-      }}
-    >
+      }}>
       <div
         className="shadow-md width-full md:w-1/2 lg:w-5/12"
         style={{
@@ -89,8 +88,7 @@ function MangaViewer(props: any) {
           marginLeft: 'auto',
           marginRight: 'auto',
           border: '1px solid #e5e5e5'
-        }}
-      >
+        }}>
         {imageLinks.map((link: string[], index: number) => {
           return (
             <MangaChapter

@@ -65,14 +65,12 @@ function MangaImage(props: any) {
       ref={ref}
       style={{
         height: '500px'
-      }}
-    >
+      }}>
       {err ? (
         <div className=" flex flex-wrap justify-center content-center h-full">
           <button
             className="bg-blue-500 px-4 py-2 rounded-md font-semibold text-lg text-white"
-            onClick={retry}
-          >
+            onClick={retry}>
             Retry
           </button>
         </div>

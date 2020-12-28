@@ -33,8 +33,7 @@ function App(props: any) {
       className="App"
       style={{
         backgroundColor: ''
-      }}
-    >
+      }}>
       <MangaLinkInput onLinkSubmitted={onLinkSubmitted} />
       <MangaViewer initialLink={initialLink} />
     </div>

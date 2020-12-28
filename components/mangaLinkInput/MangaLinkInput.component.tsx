@@ -1,14 +1,11 @@
 import React, {
   FormEvent,
-  RefObject,
   useCallback,
   useEffect,
-  useReducer,
   useRef,
   useState
 } from 'react'
-import { fromEvent, interval } from 'rxjs'
-import { throttle } from 'rxjs/operators'
+import { fromEvent, Observable } from 'rxjs'
 
 function MangaLinkInput(props: any) {
   const { onLinkSubmitted = () => {} } = props
@@ -17,9 +14,13 @@ function MangaLinkInput(props: any) {
   const hideableSearchBoxRef = useRef(null)
   const yValue = useRef(0)
   const innerHideableSearchBoxRef = useRef(null)
-  const clickObservalbleRef = useRef(
-    fromEvent(window, 'scroll').pipe(throttle(ev => interval(100)))
+  const [scrollObservalble, setScrollObservalble] = useState<Observable<Event>>(
+    null
   )
+
+  useEffect(() => {
+    setScrollObservalble(fromEvent(window, 'scroll'))
+  }, [])
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -27,7 +28,7 @@ function MangaLinkInput(props: any) {
   }
 
   function getDocHeight() {
-    var D = document
+    const D = document
     return Math.max(
       D.body.scrollHeight,
       D.documentElement.scrollHeight,
@@ -39,7 +40,7 @@ function MangaLinkInput(props: any) {
   }
 
   const isNegative = (num: number) => {
-    if (Math.sign(num) === -1 || Math.sign(num) === -0) {
+    if (Math.sign(num) === -1 || Math.sign(num) === 0) {
       return true
     } else {
       return false
@@ -77,30 +78,36 @@ function MangaLinkInput(props: any) {
   )
 
   const amountScrolled = useCallback(() => {
-    var winheight =
-      window.innerHeight ||
-      (document.documentElement || document.body).clientHeight
-    var docheight = getDocHeight()
-    var scrollTop =
+    // const winheight =
+    //   window.innerHeight ||
+    //   (document.documentElement || document.body).clientHeight
+    // const docheight = getDocHeight()
+    const scrollTop =
       window.pageYOffset ||
       (
         document.documentElement ||
         (document.body.parentNode as HTMLElement) ||
         document.body
       ).scrollTop
-    var trackLength = docheight - winheight
-    var pctScrolled = Math.floor((scrollTop / trackLength) * 100) // gets percentage scrolled (ie: 80 or NaN if tracklength == 0)
+    // const trackLength = docheight - winheight
+    // const pctScrolled = Math.floor((scrollTop / trackLength) * 100) // gets percentage scrolled (ie: 80 or NaN if tracklength == 0)
     const diff = scrollTop - previousScrllTopRef.current
     previousScrllTopRef.current = scrollTop
     moveSearchBox(hideableSearchBoxRef.current, diff)
   }, [moveSearchBox])
 
   useEffect(() => {
-    window.addEventListener('scroll', amountScrolled, false)
+    if (!scrollObservalble) return
+    const scrollObserver = scrollObservalble.subscribe(() => {
+      console.log('scroll')
+
+      amountScrolled()
+    })
+
     return () => {
-      window.removeEventListener('scroll', amountScrolled, false)
+      scrollObserver.unsubscribe()
     }
-  }, [amountScrolled])
+  }, [amountScrolled, scrollObservalble])
 
   return (
     <>
@@ -109,8 +116,7 @@ function MangaLinkInput(props: any) {
         style={{
           marginLeft: 'auto',
           marginRight: 'auto'
-        }}
-      >
+        }}>
         <div className="w-full px-2 py-4 bg-gray-200 rounded-t-md shadow-md">
           <form className="flex" onSubmit={onSubmit}>
             <input
@@ -121,8 +127,7 @@ function MangaLinkInput(props: any) {
             />
             <button
               className="rounded-r-sm px-4 py-1 font-medium bg-blue-500 text-gray-100"
-              type="submit"
-            >
+              type="submit">
               View
             </button>
           </form>
@@ -135,12 +140,10 @@ function MangaLinkInput(props: any) {
         style={{
           marginLeft: 'auto',
           marginRight: 'auto'
-        }}
-      >
+        }}>
         <div
           ref={innerHideableSearchBoxRef}
-          className="w-full px-2 py-4 bg-gray-200 rounded-t-md shadow-md absolute bottom-0 transform"
-        >
+          className="w-full px-2 py-4 bg-gray-200 rounded-t-md shadow-md absolute bottom-0 transform">
           <form className="flex" onSubmit={onSubmit}>
             <input
               className="w-full px-2 rounded-l-sm"
@@ -151,8 +154,7 @@ function MangaLinkInput(props: any) {
             />
             <button
               className="rounded-r-sm px-4 py-1 font-medium bg-blue-500 text-gray-100"
-              type="submit"
-            >
+              type="submit">
               View
             </button>
           </form>

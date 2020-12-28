@@ -54,12 +54,10 @@ function MangaChapter(props: any) {
         style={{
           fontSize: '2rem',
           padding: '1rem'
-        }}
-      >
+        }}>
         <button
           onClick={nextChapterButtonClicked}
-          className="rounded-full bg-gray-100 px-4 text-blue-600"
-        >
+          className="rounded-full bg-gray-100 px-4 text-blue-600">
           Next Chapter
         </button>
       </div>
