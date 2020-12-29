@@ -99,7 +99,6 @@ function MangaLinkInput(props: any) {
   useEffect(() => {
     if (!scrollObservalble) return
     const scrollObserver = scrollObservalble.subscribe(() => {
-      console.log('scroll')
 
       amountScrolled()
     })

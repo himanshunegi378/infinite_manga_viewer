@@ -6,17 +6,31 @@ import React, {
   useState
 } from 'react'
 import useOnScreen from '../../hooks/useOnScreen'
+import useVisibilityPercent from '../../hooks/useVisbilityPercent'
+import { eventManager } from '../../lib/eventManager'
 import MangaImage from '../mangaImage/MangaImage.component'
 
 function MangaChapter(props: any) {
-  const { imageLinks, onChapterFinished = () => {} } = props
+  const { onChapterFinished = () => {} } = props
   const isActive = useRef(true)
   const isLoading = useRef(false)
   const nextChapterRef = useRef<HTMLDivElement>(null)
+  const outerRef = useRef<HTMLDivElement>(null)
   const [isVisible, disaleVisbilityDetection] = useOnScreen(
     nextChapterRef,
     window.innerHeight * 4
   )
+  const [
+    visbilityPercetage,
+    disableVisibiltyPercentageTracker
+  ] = useVisibilityPercent(outerRef)
+
+  useEffect(() => {
+    if (visbilityPercetage > 80) {
+      eventManager.emit('visibleEnough', props.chapterUrl)
+    }
+  }, [props.chapterUrl, visbilityPercetage])
+
   const nextChapterLoadCommand = useCallback(async () => {
     if (!isActive.current) return
     if (isLoading.current) return
@@ -44,10 +58,8 @@ function MangaChapter(props: any) {
   )
 
   return (
-    <>
-      {imageLinks.map((link: string, index: number) => {
-        return <MangaImage key={index} imageLink={link} />
-      })}
+    <div ref={outerRef}>
+      {props.children}
       <div
         className="text-center"
         ref={nextChapterRef}
@@ -61,7 +73,7 @@ function MangaChapter(props: any) {
           Next Chapter
         </button>
       </div>
-    </>
+    </div>
   )
 }
 

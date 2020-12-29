@@ -1,3 +1,4 @@
+import { resolveHref } from 'next/dist/next-server/lib/router/router'
 import React, { SyntheticEvent, useEffect, useRef, useState } from 'react'
 import useEffectDebugger from '../../hooks/useEffectDebug'
 import useOnScreen from '../../hooks/useOnScreen'
@@ -28,21 +29,12 @@ function MangaImage(props: any) {
   }, [isVisible, disable])
 
   const onImageLoaded = () => {
+    if (!ref.current) return
     ref.current.style.height = 'auto'
   }
 
-  useEffectDebugger(() => {
-    function onError(event) {
-      console.log(event.type)
-      console.log(event)
-    }
-    ref.current.addEventListener('error', onError)
-    return () => {
-      ref.current.removeEventListener('error', onError)
-    }
-  }, [])
-
   const onError = (event: SyntheticEvent<HTMLImageElement, Event>) => {
+    if (!NoOfTimesRetried) return
     if (NoOfTimesRetried.current <= retryLimit) {
       setTimeout(() => {
         NoOfTimesRetried.current += 1

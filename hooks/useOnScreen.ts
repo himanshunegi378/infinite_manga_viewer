@@ -2,13 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { fromEvent, interval } from 'rxjs'
 import { throttle } from 'rxjs/operators'
 
-const checkVisbility = (element: any, offset: number): boolean => {
+const checkVisbility = (element: HTMLElement, offset: number): boolean => {
   const position = element.getBoundingClientRect()
   if (
-    //@ts-ignore
     (position.top - offset < window.innerHeight &&
       position.top - offset >= 0) ||
-    //@ts-ignore
     (position?.bottom + offset < window.innerHeight &&
       position?.bottom + offset >= 0) ||
     (position.top - offset < window.innerHeight &&
@@ -22,7 +20,7 @@ const checkVisbility = (element: any, offset: number): boolean => {
 export default function useOnScreen(
   ref: any,
   offset: number,
-  updateInterval: number = 100
+  updateInterval= 100
 ): [boolean, () => void] {
   const [isVisible, setIsVisible] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)

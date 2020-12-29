@@ -1,9 +1,11 @@
 import Axios from 'axios'
 import { toUnicode } from 'punycode'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import config from '../../config'
 import MangaChapter from '../mangaChapter/MangaChapter.component'
 import { useRouter } from 'next/router'
+import MangaImage from '../mangaImage/MangaImage.component'
+import { eventManager } from '../../lib/eventManager'
 
 const fetchChapterInfo = async (link: string): Promise<any> => {
   try {
@@ -33,8 +35,29 @@ function MangaViewer(props: any) {
   const router = useRouter()
 
   const { initialLink = '' } = props
-  const [imageLinks, setImageLinks] = useState<string[][]>([])
+  const [chapterInfoList, setChapterInfoList] = useState<
+    { chapterUrl: string; imagesUrl: string[] }[]
+  >([])
   const [nextChapterLink, setNextChapterLink] = useState<string>('')
+  const currentChapterLink = useRef<string>('')
+
+  const onVisibleEnough = useCallback(chapterUrl => {
+    console.log(chapterUrl)
+    changeCurentChapterUrlInRoute(chapterUrl)
+  }, [])
+
+  const changeCurentChapterUrlInRoute = (chapterUrl: string) => {
+    router.push(`/?chapterURL=${encodeURIComponent(chapterUrl)}`, undefined, {
+      shallow: true
+    })
+  }
+
+  useEffect(() => {
+    eventManager.on('visibleEnough', onVisibleEnough)
+    return () => {
+      eventManager.off('visibleEnough', onVisibleEnough)
+    }
+  }, [onVisibleEnough])
 
   useEffect(() => {
     if (!initialLink) return
@@ -42,14 +65,13 @@ function MangaViewer(props: any) {
     fetchChapterInfo(initialLink).then(info => {
       const { code, data } = info
       if (code === 'CHAPTER') {
-        setImageLinks(prevState => [[...data.imageList]])
+        setChapterInfoList([
+          { chapterUrl: initialLink, imagesUrl: data.imageList }
+        ])
         setNextChapterLink(data.nextChapterLink)
-        router.push(
-          `/?chapterURL=${encodeURIComponent(initialLink)}`,
-          undefined,
-          { shallow: true }
-        )
-        console.log('initial link ', initialLink)
+        changeCurentChapterUrlInRoute(initialLink)
+
+        currentChapterLink.current = initialLink
       }
     })
   }, [initialLink])
@@ -59,14 +81,10 @@ function MangaViewer(props: any) {
 
     const { code, data } = await fetchChapterInfo(nextChapterLink)
     if (code === 'CHAPTER') {
-      router.push(
-        `/?chapterURL=${encodeURIComponent(nextChapterLink)}`,
-        undefined,
-        { shallow: true }
-      )
-      console.log('next chapter link ', nextChapterLink)
-
-      setImageLinks(prevState => [...prevState, [...data.imageList]])
+      setChapterInfoList(prevState => [
+        ...prevState,
+        { chapterUrl: nextChapterLink, imagesUrl: data.imageList }
+      ])
       setNextChapterLink(data.nextChapterLink)
 
       return true
@@ -82,20 +100,23 @@ function MangaViewer(props: any) {
         backgroundColor: ''
       }}>
       <div
-        className="shadow-md width-full md:w-1/2 lg:w-5/12"
+        className="shadow-md width-full max-w-xl"
         style={{
           //   maxWidth: "720px",
           marginLeft: 'auto',
           marginRight: 'auto',
           border: '1px solid #e5e5e5'
         }}>
-        {imageLinks.map((link: string[], index: number) => {
+        {chapterInfoList.map(({ chapterUrl, imagesUrl }, index: number) => {
           return (
             <MangaChapter
-              imageLinks={link}
               onChapterFinished={onChapterFinished}
-              key={index}
-            />
+              chapterUrl={chapterUrl}
+              key={index}>
+              {imagesUrl.map((url, index) => (
+                <MangaImage key={index} imageLink={url} />
+              ))}
+            </MangaChapter>
           )
         })}
       </div>
