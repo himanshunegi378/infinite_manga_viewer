@@ -47,6 +47,8 @@ function MangaViewer(props: any) {
   }, [])
 
   const changeCurentChapterUrlInRoute = (chapterUrl: string) => {
+    if (chapterUrl === currentChapterLink.current) return
+    currentChapterLink.current = chapterUrl
     router.push(`/?chapterURL=${encodeURIComponent(chapterUrl)}`, undefined, {
       shallow: true
     })
@@ -70,8 +72,6 @@ function MangaViewer(props: any) {
         ])
         setNextChapterLink(data.nextChapterLink)
         changeCurentChapterUrlInRoute(initialLink)
-
-        currentChapterLink.current = initialLink
       }
     })
   }, [initialLink])
