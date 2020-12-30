@@ -1,11 +1,8 @@
 import Axios from 'axios'
-import { toUnicode } from 'punycode'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import config from '../../config'
 import MangaChapter from '../mangaChapter/MangaChapter.component'
 import { useRouter } from 'next/router'
 import MangaImage from '../mangaImage/MangaImage.component'
-import { eventManager } from '../../lib/eventManager'
 
 const fetchChapterInfo = async (link: string): Promise<any> => {
   try {
@@ -41,25 +38,17 @@ function MangaViewer(props: any) {
   const [nextChapterLink, setNextChapterLink] = useState<string>('')
   const currentChapterLink = useRef<string>('')
 
-  const onVisibleEnough = useCallback(chapterUrl => {
-    console.log(chapterUrl)
-    changeCurentChapterUrlInRoute(chapterUrl)
-  }, [])
-
-  const changeCurentChapterUrlInRoute = (chapterUrl: string) => {
-    if (chapterUrl === currentChapterLink.current) return
-    currentChapterLink.current = chapterUrl
-    router.push(`/?chapterURL=${encodeURIComponent(chapterUrl)}`, undefined, {
-      shallow: true
-    })
-  }
+  const changeCurentChapterUrlInRoute = useRef(null)
 
   useEffect(() => {
-    eventManager.on('visibleEnough', onVisibleEnough)
-    return () => {
-      eventManager.off('visibleEnough', onVisibleEnough)
+    changeCurentChapterUrlInRoute.current = (chapterUrl: string) => {
+      if (chapterUrl === currentChapterLink.current) return
+      currentChapterLink.current = chapterUrl
+      router.push(`/?chapterURL=${encodeURIComponent(chapterUrl)}`, undefined, {
+        shallow: true
+      })
     }
-  }, [onVisibleEnough])
+  }, [router])
 
   useEffect(() => {
     if (!initialLink) return
@@ -71,7 +60,7 @@ function MangaViewer(props: any) {
           { chapterUrl: initialLink, imagesUrl: data.imageList }
         ])
         setNextChapterLink(data.nextChapterLink)
-        changeCurentChapterUrlInRoute(initialLink)
+        changeCurentChapterUrlInRoute.current(initialLink)
       }
     })
   }, [initialLink])
@@ -112,6 +101,7 @@ function MangaViewer(props: any) {
             <MangaChapter
               onChapterFinished={onChapterFinished}
               chapterUrl={chapterUrl}
+              onVisible={() => changeCurentChapterUrlInRoute.current(chapterUrl)}
               key={index}>
               {imagesUrl.map((url, index) => (
                 <MangaImage key={index} imageLink={url} />
