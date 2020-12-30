@@ -83,6 +83,13 @@ function MangaViewer(props: any) {
     return false
   }, [nextChapterLink])
 
+  const visibilityHandle = (isVisible: boolean,chapterUrl: string) => {
+    if(isVisible){
+      changeCurentChapterUrlInRoute.current(chapterUrl)
+    }
+  }
+  
+
   return (
     <div
       style={{
@@ -101,7 +108,7 @@ function MangaViewer(props: any) {
             <MangaChapter
               onChapterFinished={onChapterFinished}
               chapterUrl={chapterUrl}
-              onVisible={() => changeCurentChapterUrlInRoute.current(chapterUrl)}
+              onVisiblityChange={(visibilitySatus: boolean) => visibilityHandle(visibilitySatus,chapterUrl)}
               key={index}>
               {imagesUrl.map((url, index) => (
                 <MangaImage key={index} imageLink={url} />

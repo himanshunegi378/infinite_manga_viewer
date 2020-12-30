@@ -9,7 +9,7 @@ import useOnScreen from '../../hooks/useOnScreen'
 import useVisibilityPercent from '../../hooks/useVisbilityPercent'
 
 function MangaChapter(props: any) {
-  const { onChapterFinished = () => {}, onVisible } = props
+  const { onChapterFinished = () => {},  onVisiblityChange } = props
   const isActive = useRef(true)
   const isLoading = useRef(false)
   const nextChapterRef = useRef<HTMLDivElement>(null)
@@ -25,9 +25,11 @@ function MangaChapter(props: any) {
 
   useEffect(() => {
     if (visbilityPercetage > 80) {
-      onVisible()
+      onVisiblityChange(true)
+    }else{
+      onVisiblityChange(false)
     }
-  }, [onVisible, visbilityPercetage])
+  }, [onVisiblityChange, visbilityPercetage])
 
   const nextChapterLoadCommand = useCallback(async () => {
     if (!isActive.current) return
