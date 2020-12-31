@@ -24,6 +24,7 @@ function MangaLinkInput(props: any) {
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if(!link) return
     onLinkSubmitted(link)
   }
 

@@ -52,10 +52,10 @@ function MangaViewer(props: any) {
 
   useEffect(() => {
     if (!initialLink) return
-    setNextChapterLink('')
     fetchChapterInfo(initialLink).then(info => {
       const { code, data } = info
       if (code === 'CHAPTER') {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         setChapterInfoList([
           { chapterUrl: initialLink, imagesUrl: data.imageList }
         ])
@@ -83,12 +83,11 @@ function MangaViewer(props: any) {
     return false
   }, [nextChapterLink])
 
-  const visibilityHandle = (isVisible: boolean,chapterUrl: string) => {
-    if(isVisible){
+  const visibilityHandle = (isVisible: boolean, chapterUrl: string) => {
+    if (isVisible) {
       changeCurentChapterUrlInRoute.current(chapterUrl)
     }
   }
-  
 
   return (
     <div
@@ -108,7 +107,9 @@ function MangaViewer(props: any) {
             <MangaChapter
               onChapterFinished={onChapterFinished}
               chapterUrl={chapterUrl}
-              onVisiblityChange={(visibilitySatus: boolean) => visibilityHandle(visibilitySatus,chapterUrl)}
+              onVisiblityChange={(visibilitySatus: boolean) =>
+                visibilityHandle(visibilitySatus, chapterUrl)
+              }
               key={index}>
               {imagesUrl.map((url, index) => (
                 <MangaImage key={index} imageLink={url} />

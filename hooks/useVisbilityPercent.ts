@@ -63,6 +63,7 @@ export default function useVisibilityPercent(
   )
 
   useEffect(() => {
+    if(!ref.current) return
     setVisiblePercent(getVisbilityPercentage(ref.current))
   }, [ref])
 
