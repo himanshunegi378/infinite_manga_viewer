@@ -29,8 +29,7 @@ function inViewPort(element: HTMLElement) {
 const getVisbilityPercentage = (element: HTMLElement) => {
   const position = element.getBoundingClientRect()
   if (
-    (position.top < 0 &&
-      position.bottom > window.innerHeight) ||
+    (position.top < 0 && position.bottom > window.innerHeight) ||
     inViewPort(element)
   ) {
     return 100
@@ -43,7 +42,7 @@ const getVisbilityPercentage = (element: HTMLElement) => {
       if (position.top < window.innerHeight && position.top >= 0) {
         const visbilityPercentage =
           ((window.innerHeight - position.top) / window.innerHeight) * 100
-      console.log('top visible')
+        console.log('top visible')
 
         return visbilityPercentage
       }
@@ -63,7 +62,7 @@ export default function useVisibilityPercent(
   )
 
   useEffect(() => {
-    if(!ref.current) return
+    if (!ref.current) return
     setVisiblePercent(getVisbilityPercentage(ref.current))
   }, [ref])
 

@@ -24,7 +24,7 @@ function MangaLinkInput(props: any) {
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if(!link) return
+    if (!link) return
     onLinkSubmitted(link)
   }
 
@@ -100,7 +100,6 @@ function MangaLinkInput(props: any) {
   useEffect(() => {
     if (!scrollObservalble) return
     const scrollObserver = scrollObservalble.subscribe(() => {
-
       amountScrolled()
     })
 
