@@ -12,10 +12,10 @@ function MangaImage(props: any) {
   const timeInterval = 500
   const ref = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
-  const [isVisible, disable] = useOnScreen(ref, window.innerHeight)
+  const [isVisible, disable] = useOnScreen(ref, 100)
 
   useEffect(() => {
-    let id: number | undefined = undefined
+    let id: number | undefined = -1
 
     if (isVisible) {
       id = window.setTimeout(() => {
@@ -26,7 +26,7 @@ function MangaImage(props: any) {
     return () => {
       window.clearTimeout(id)
     }
-  }, [isVisible, disable])
+  }, [disable, isVisible])
 
   const onImageLoaded = () => {
     if (!ref.current) return
@@ -70,6 +70,7 @@ function MangaImage(props: any) {
       {isActive ? (
         <img
           ref={imageRef}
+          data-testid="mangaImage"
           style={{
             verticalAlign: 'bottom',
             width: '100%',
@@ -82,7 +83,12 @@ function MangaImage(props: any) {
           alt="l"
         />
       ) : (
-        <img src="/loading.gif" width="128" height="128" />
+        <img
+          data-testid="fallbackImage"
+          src="/loading.gif"
+          width="128"
+          height="128"
+        />
       )}
     </div>
   )

@@ -19,14 +19,18 @@ const checkVisbility = (element: HTMLElement, offset: number): boolean => {
 }
 export default function useOnScreen(
   ref: any,
-  offset: number,
+  offset = 0,
   updateInterval = 100
 ): [boolean, () => void] {
   const [isVisible, setIsVisible] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
-  const clickObservalbleRef = useRef(
-    fromEvent(window, 'scroll').pipe(throttle(ev => interval(updateInterval)))
-  )
+  const clickObservalbleRef = useRef(null)
+
+  useEffect(() => {
+    clickObservalbleRef.current = fromEvent(window, 'scroll').pipe(
+      throttle(ev => interval(updateInterval))
+    )
+  }, [updateInterval])
 
   useEffect(() => {
     if (checkVisbility(ref.current, offset)) {
