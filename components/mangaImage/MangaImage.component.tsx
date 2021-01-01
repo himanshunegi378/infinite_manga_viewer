@@ -10,15 +10,23 @@ import React, {
 import useEffectDebugger from '../../hooks/useEffectDebug'
 import useOnScreen from '../../hooks/useOnScreen'
 
+const initialControlState: ControlState = {
+  throttlValue: 100,
+  retryLimit: 3,
+  retryInterval: 500
+}
+
 type ControlState = {
   throttlValue: number
   retryLimit: number
   retryInterval: number
+  imageLoadDelay: number
 }
 type Action =
   | { type: 'updateThrottleValue'; throttleValue: number }
   | { type: 'updateRetryLimit'; retryLimit: number }
   | { type: 'updateRetryInterval'; retryInterval: number }
+  | { type: 'updateImageLoadDelay'; imageLoadDelay: number }
 
 function reducer(state: ControlState, action: Action): ControlState {
   switch (action.type) {
@@ -34,28 +42,36 @@ function reducer(state: ControlState, action: Action): ControlState {
       return Object.assign(state, {
         retryInterval: action.retryInterval
       })
+    case 'updateImageLoadDelay':
+      return Object.assign(state, {
+        retryInterval: action.imageLoadDelay
+      })
     default:
       return Object.assign(state)
   }
 }
 
 function MangaImage(props: any) {
-  const { imageLink } = props
-  const [{ retryInterval, retryLimit, throttlValue }, dispatch] = useReducer(
-    reducer,
-    {
-      throttlValue: 100,
-      retryLimit: 3,
-      retryInterval: 500
-    }
-  )
+  const { imageLink, visibilityDetection = true } = props
+  const [
+    { retryInterval, retryLimit, throttlValue, imageLoadDelay },
+    dispatch
+  ] = useReducer(reducer, initialControlState)
   const [isActive, setIsActive] = useState(false)
   const [err, setErr] = useState(false)
   const NoOfTimesRetried = useRef(0)
   const ref = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
-  const [isVisible, disable] = useOnScreen(ref, 100,throttlValue)
+  const [isVisible, disable, enable] = useOnScreen(ref, 100, throttlValue)
 
+  useEffect(() => {
+    visibilityDetection === true ? enable() : disable()
+  }, [disable, enable, visibilityDetection])
+
+  /** Start timer when counter container is visbile
+   * reset the timer if visibilty changes to invisible
+   * disable visibility detection once timer is completed
+   */
   useEffect(() => {
     let id = -1
 
@@ -63,12 +79,12 @@ function MangaImage(props: any) {
       id = window.setTimeout(() => {
         setIsActive(true)
         disable()
-      }, 500)
+      }, imageLoadDelay)
     }
     return () => {
       window.clearTimeout(id)
     }
-  }, [disable, isVisible])
+  }, [disable, imageLoadDelay, isVisible])
 
   const onImageLoaded = () => {
     if (!ref.current) return

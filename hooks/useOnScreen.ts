@@ -21,7 +21,7 @@ export default function useOnScreen(
   ref: RefObject<HTMLElement>,
   offset = 0,
   updateInterval = 100
-): [boolean, () => void] {
+): [boolean, () => void,()=>void] {
   const [isVisible, setIsVisible] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
   const [clickObservalble, setClickObservalble] = useState(null)
@@ -70,5 +70,9 @@ export default function useOnScreen(
     setIsDisabled(true)
   }, [])
 
-  return [isVisible, disable]
+  const enable = useCallback((): void => {
+    setIsDisabled(false)
+  }, [])
+
+  return [isVisible, disable,enable]
 }

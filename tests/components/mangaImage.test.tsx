@@ -22,6 +22,26 @@ describe('MangaImage Component', () => {
     ).toBeInTheDocument()
     done()
   })
+
+  it('should disable visibility detection if visibiltyDetection props is false',async (done) => {
+    const { getByTestId, findByTestId } = render(
+      <MangaImage
+        imageLink={
+          'https://mangatx.com/wp-content/uploads/WP-manga/data/manga_5d8f4b9dee659/510370694f609a81e800c2c9581feeec/001.jpg'
+        }
+        visibilityDetection={false}
+      />
+    )
+    expect(
+      await waitFor(() => getByTestId('fallbackImage'))
+    ).toBeInTheDocument()
+
+    expect(
+      await waitFor(() => getByTestId('mangaImage'), { timeout: 500 })
+    ).not.toBeInTheDocument()
+    done()
+    
+  })
 })
 
 export {}
