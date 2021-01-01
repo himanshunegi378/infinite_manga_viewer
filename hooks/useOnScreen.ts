@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import { fromEvent, interval } from 'rxjs'
 import { throttle } from 'rxjs/operators'
 
@@ -18,17 +18,17 @@ const checkVisbility = (element: HTMLElement, offset: number): boolean => {
   }
 }
 export default function useOnScreen(
-  ref: any,
+  ref: RefObject<HTMLElement>,
   offset = 0,
   updateInterval = 100
 ): [boolean, () => void] {
   const [isVisible, setIsVisible] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
-  const clickObservalbleRef = useRef(null)
+  const [clickObservalble, setClickObservalble] = useState(null)
 
   useEffect(() => {
-    clickObservalbleRef.current = fromEvent(window, 'scroll').pipe(
-      throttle(ev => interval(updateInterval))
+    setClickObservalble(
+      fromEvent(window, 'scroll').pipe(throttle(ev => interval(updateInterval)))
     )
   }, [updateInterval])
 
@@ -41,7 +41,7 @@ export default function useOnScreen(
   }, [offset, ref])
 
   useEffect(() => {
-    if (isDisabled) return
+    if (isDisabled || !clickObservalble) return
 
     const onScroll = () => {
       if (!ref.current) {
@@ -58,13 +58,13 @@ export default function useOnScreen(
       }
     }
 
-    const scrollObserver = clickObservalbleRef.current.subscribe(() => {
+    const scrollObserver = clickObservalble.subscribe(() => {
       onScroll()
     })
     return () => {
       scrollObserver.unsubscribe()
     }
-  }, [isDisabled, isVisible, offset, ref])
+  }, [clickObservalble, isDisabled, isVisible, offset, ref])
 
   const disable = useCallback((): void => {
     setIsDisabled(true)

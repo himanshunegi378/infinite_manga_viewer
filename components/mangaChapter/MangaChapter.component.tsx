@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState
 } from 'react'
+import useEffectDebugger from '../../hooks/useEffectDebug'
 import useOnScreen from '../../hooks/useOnScreen'
 import useVisibilityPercent from '../../hooks/useVisbilityPercent'
 
@@ -14,20 +15,24 @@ function MangaChapter(props: any) {
   const isLoading = useRef(false)
   const nextChapterRef = useRef<HTMLDivElement>(null)
   const outerRef = useRef<HTMLDivElement>(null)
-  const [isVisible, disaleVisbilityDetection] = useOnScreen(
-    nextChapterRef,
-    window.innerHeight * 4
-  )
+  const isAlreadyVisible = useRef(false)
+  const [isVisible, disaleVisbilityDetection] = useOnScreen(nextChapterRef, 600)
   const [
     visbilityPercetage,
     disableVisibiltyPercentageTracker
   ] = useVisibilityPercent(outerRef)
 
-  useEffect(() => {
+  useEffectDebugger(() => {
     if (visbilityPercetage > 80) {
-      onVisiblityChange(true)
+      if (!isAlreadyVisible.current) {
+        isAlreadyVisible.current = true
+        onVisiblityChange(isAlreadyVisible.current)
+      }
     } else {
-      onVisiblityChange(false)
+      if (isAlreadyVisible.current) {
+        isAlreadyVisible.current = false
+        onVisiblityChange(isAlreadyVisible.current)
+      }
     }
   }, [onVisiblityChange, visbilityPercetage])
 

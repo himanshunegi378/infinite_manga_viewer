@@ -1,21 +1,63 @@
 import { resolveHref } from 'next/dist/next-server/lib/router/router'
-import React, { SyntheticEvent, useEffect, useRef, useState } from 'react'
+import { type } from 'os'
+import React, {
+  SyntheticEvent,
+  useEffect,
+  useReducer,
+  useRef,
+  useState
+} from 'react'
 import useEffectDebugger from '../../hooks/useEffectDebug'
 import useOnScreen from '../../hooks/useOnScreen'
 
+type ControlState = {
+  throttlValue: number
+  retryLimit: number
+  retryInterval: number
+}
+type Action =
+  | { type: 'updateThrottleValue'; throttleValue: number }
+  | { type: 'updateRetryLimit'; retryLimit: number }
+  | { type: 'updateRetryInterval'; retryInterval: number }
+
+function reducer(state: ControlState, action: Action): ControlState {
+  switch (action.type) {
+    case 'updateThrottleValue':
+      return Object.assign(state, {
+        throttleValue: action.throttleValue
+      })
+    case 'updateRetryLimit':
+      return Object.assign(state, {
+        retryLimit: action.retryLimit
+      })
+    case 'updateRetryInterval':
+      return Object.assign(state, {
+        retryInterval: action.retryInterval
+      })
+    default:
+      return Object.assign(state)
+  }
+}
+
 function MangaImage(props: any) {
   const { imageLink } = props
+  const [{ retryInterval, retryLimit, throttlValue }, dispatch] = useReducer(
+    reducer,
+    {
+      throttlValue: 100,
+      retryLimit: 3,
+      retryInterval: 500
+    }
+  )
   const [isActive, setIsActive] = useState(false)
   const [err, setErr] = useState(false)
-  const retryLimit = 3
   const NoOfTimesRetried = useRef(0)
-  const timeInterval = 500
   const ref = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
-  const [isVisible, disable] = useOnScreen(ref, 100)
+  const [isVisible, disable] = useOnScreen(ref, 100,throttlValue)
 
   useEffect(() => {
-    let id: number | undefined = -1
+    let id = -1
 
     if (isVisible) {
       id = window.setTimeout(() => {
@@ -39,7 +81,7 @@ function MangaImage(props: any) {
       setTimeout(() => {
         NoOfTimesRetried.current += 1
         retry()
-      }, timeInterval * NoOfTimesRetried.current)
+      }, retryInterval * NoOfTimesRetried.current)
     } else {
       setErr(true)
     }

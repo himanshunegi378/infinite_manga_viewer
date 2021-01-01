@@ -83,11 +83,14 @@ function MangaViewer(props: any) {
     return false
   }, [nextChapterLink])
 
-  const visibilityHandle = (isVisible: boolean, chapterUrl: string) => {
-    if (isVisible) {
-      changeCurentChapterUrlInRoute.current(chapterUrl)
-    }
-  }
+  const visibilityHandle = useCallback(
+    (isVisible: boolean, chapterUrl: string) => {
+      if (isVisible) {
+        changeCurentChapterUrlInRoute.current(chapterUrl)
+      }
+    },
+    [],
+  )
 
   return (
     <div

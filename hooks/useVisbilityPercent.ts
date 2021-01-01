@@ -57,9 +57,13 @@ export default function useVisibilityPercent(
 ): [number, () => void] {
   const [visiblePercent, setVisiblePercent] = useState(0)
   const [isDisabled, setIsDisabled] = useState(false)
-  const clickObservalbleRef = useRef(
-    fromEvent(window, 'scroll').pipe(throttle(() => interval(updateInterval)))
-  )
+  const [clickObservalble, setClickObservalble] = useState(null)
+
+  useEffect(() => {
+    setClickObservalble(
+      fromEvent(window, 'scroll').pipe(throttle(() => interval(updateInterval)))
+    )
+  }, [updateInterval])
 
   useEffect(() => {
     if (!ref.current) return
@@ -67,7 +71,7 @@ export default function useVisibilityPercent(
   }, [ref])
 
   useEffect(() => {
-    if (isDisabled) return
+    if (isDisabled || !clickObservalble) return
     if (!ref.current) {
       return
     }
@@ -75,13 +79,13 @@ export default function useVisibilityPercent(
       setVisiblePercent(getVisbilityPercentage(ref.current))
     }
 
-    const scrollObserver = clickObservalbleRef.current.subscribe(() => {
+    const scrollObserver = clickObservalble.subscribe(() => {
       onScroll()
     })
     return () => {
       scrollObserver.unsubscribe()
     }
-  }, [isDisabled, ref])
+  }, [clickObservalble, isDisabled, ref])
 
   const disable = useCallback((): void => {
     setIsDisabled(true)
