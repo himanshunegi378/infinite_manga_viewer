@@ -3,10 +3,9 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState
 } from 'react'
-import { fromEvent, interval, Observable } from 'rxjs'
+import { fromEvent, interval } from 'rxjs'
 import { throttle } from 'rxjs/operators'
 import useObservable from './useObservable'
 
@@ -37,7 +36,7 @@ export default function useOnScreen(
   const observable = useMemo(
     () =>
       fromEvent(window, 'scroll').pipe(
-        throttle(ev => interval(updateInterval))
+        throttle(() => interval(updateInterval))
       ),
     [updateInterval]
   )
