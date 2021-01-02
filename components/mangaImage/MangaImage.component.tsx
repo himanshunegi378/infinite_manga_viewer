@@ -3,6 +3,7 @@ import { type } from 'os'
 import React, {
   ReactElement,
   SyntheticEvent,
+  useCallback,
   useEffect,
   useReducer,
   useRef,
@@ -54,7 +55,7 @@ function reducer(state: ControlState, action: Action): ControlState {
   }
 }
 
-function MangaImage(props: any):ReactElement {
+function MangaImage(props: any): ReactElement {
   const { imageLink, visibilityDetection = true } = props
   const [
     { retryInterval, retryLimit, throttlValue, imageLoadDelay },
@@ -71,32 +72,12 @@ function MangaImage(props: any):ReactElement {
     visibilityDetection === true ? enable() : disable()
   }, [disable, enable, visibilityDetection])
 
-  useTimeout(
-    () => {
-      setIsActive(true)
-      disable()
-    },
-    isVisible ? imageLoadDelay : null
-  )
+  const onVisible = useCallback(() => {
+    setIsActive(true)
+    disable()
+  }, [disable])
 
-  /** Start timer when counter container is visbile
-   * reset the timer if visibilty changes to invisible
-   * disable visibility detection once timer is completed
-   */
-
-  // useEffect(() => {
-  //   let id = -1
-
-  //   if (isVisible) {
-  //     id = window.setTimeout(() => {
-  //       setIsActive(true)
-  //       disable()
-  //     }, imageLoadDelay)
-  //   }
-  //   return () => {
-  //     window.clearTimeout(id)
-  //   }
-  // }, [disable, imageLoadDelay, isVisible])
+  useTimeout(onVisible, isVisible ? imageLoadDelay : null)
 
   const onImageLoaded = () => {
     if (!ref.current) return
