@@ -1,10 +1,4 @@
-import {
-  RefObject,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo
-} from 'react'
+import { RefObject, useCallback, useEffect, useState, useMemo } from 'react'
 import { fromEvent, interval } from 'rxjs'
 import { throttle } from 'rxjs/operators'
 import getVisbilityPercentage from '../lib/VisbilityPercentage'
@@ -13,7 +7,7 @@ import useObservable from './useObservable'
 export default function useVisibilityPercent(
   ref: RefObject<HTMLElement>,
   updateInterval = 100
-): [number, () => void] {
+): [number, () => void, () => void] {
   const [visiblePercent, setVisiblePercent] = useState(0)
   const [isDisabled, setIsDisabled] = useState(false)
 
@@ -66,5 +60,9 @@ export default function useVisibilityPercent(
     setIsDisabled(true)
   }, [])
 
-  return [visiblePercent, disable]
+  const enable = useCallback((): void => {
+    setIsDisabled(false)
+  }, [])
+
+  return [visiblePercent, disable, enable]
 }

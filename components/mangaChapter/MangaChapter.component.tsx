@@ -1,5 +1,6 @@
 import React, {
   MouseEvent,
+  ReactElement,
   useCallback,
   useEffect,
   useRef,
@@ -9,7 +10,7 @@ import useEffectDebugger from '../../hooks/useEffectDebug'
 import useOnScreen from '../../hooks/useOnScreen'
 import useVisibilityPercent from '../../hooks/useVisbilityPercent'
 
-function MangaChapter(props: any) {
+function MangaChapter(props: any):ReactElement {
   const { onChapterFinished = () => {}, onVisiblityChange } = props
   const isActive = useRef(true)
   const isLoading = useRef(false)
@@ -22,7 +23,7 @@ function MangaChapter(props: any) {
     disableVisibiltyPercentageTracker
   ] = useVisibilityPercent(outerRef)
 
-  useEffectDebugger(() => {
+  useEffect(() => {
     if (visbilityPercetage > 80) {
       if (!isAlreadyVisible.current) {
         isAlreadyVisible.current = true
