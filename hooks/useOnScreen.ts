@@ -1,6 +1,14 @@
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
-import { fromEvent, interval } from 'rxjs'
+import {
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
+import { fromEvent, interval, Observable } from 'rxjs'
 import { throttle } from 'rxjs/operators'
+import useObservable from './useObservable'
 
 const checkVisbility = (element: HTMLElement, offset: number): boolean => {
   const position = element.getBoundingClientRect()
@@ -17,20 +25,39 @@ const checkVisbility = (element: HTMLElement, offset: number): boolean => {
     return false
   }
 }
+
 export default function useOnScreen(
   ref: RefObject<HTMLElement>,
   offset = 0,
   updateInterval = 100
-): [boolean, () => void,()=>void] {
+): [boolean, () => void, () => void] {
   const [isVisible, setIsVisible] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
-  const [clickObservalble, setClickObservalble] = useState(null)
 
-  useEffect(() => {
-    setClickObservalble(
-      fromEvent(window, 'scroll').pipe(throttle(ev => interval(updateInterval)))
-    )
-  }, [updateInterval])
+  const observable = useMemo(
+    () =>
+      fromEvent(window, 'scroll').pipe(
+        throttle(ev => interval(updateInterval))
+      ),
+    [updateInterval]
+  )
+
+  const observer = useCallback(() => {
+    if (!ref.current) {
+      return
+    }
+    if (checkVisbility(ref.current, offset)) {
+      if (!isVisible) {
+        setIsVisible(true)
+      }
+    } else {
+      if (isVisible) {
+        setIsVisible(false)
+      }
+    }
+  }, [isVisible, offset, ref])
+
+  const [subscribe, unsubscribe] = useObservable(observable, observer)
 
   useEffect(() => {
     if (checkVisbility(ref.current, offset)) {
@@ -41,30 +68,12 @@ export default function useOnScreen(
   }, [offset, ref])
 
   useEffect(() => {
-    if (isDisabled || !clickObservalble) return
-
-    const onScroll = () => {
-      if (!ref.current) {
-        return
-      }
-      if (checkVisbility(ref.current, offset)) {
-        if (!isVisible) {
-          setIsVisible(true)
-        }
-      } else {
-        if (isVisible) {
-          setIsVisible(false)
-        }
-      }
+    if (isDisabled) {
+      unsubscribe()
+    } else {
+      subscribe
     }
-
-    const scrollObserver = clickObservalble.subscribe(() => {
-      onScroll()
-    })
-    return () => {
-      scrollObserver.unsubscribe()
-    }
-  }, [clickObservalble, isDisabled, isVisible, offset, ref])
+  }, [isDisabled, subscribe, unsubscribe])
 
   const disable = useCallback((): void => {
     setIsDisabled(true)
@@ -74,5 +83,5 @@ export default function useOnScreen(
     setIsDisabled(false)
   }, [])
 
-  return [isVisible, disable,enable]
+  return [isVisible, disable, enable]
 }
