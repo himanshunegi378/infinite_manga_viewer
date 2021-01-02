@@ -1,6 +1,7 @@
 import { resolveHref } from 'next/dist/next-server/lib/router/router'
 import { type } from 'os'
 import React, {
+  ReactElement,
   SyntheticEvent,
   useEffect,
   useReducer,
@@ -9,11 +10,13 @@ import React, {
 } from 'react'
 import useEffectDebugger from '../../hooks/useEffectDebug'
 import useOnScreen from '../../hooks/useOnScreen'
+import useTimeout from '../../hooks/useTimeout'
 
 const initialControlState: ControlState = {
   throttlValue: 100,
   retryLimit: 3,
-  retryInterval: 500
+  retryInterval: 500,
+  imageLoadDelay: 100
 }
 
 type ControlState = {
@@ -51,7 +54,7 @@ function reducer(state: ControlState, action: Action): ControlState {
   }
 }
 
-function MangaImage(props: any) {
+function MangaImage(props: any):ReactElement {
   const { imageLink, visibilityDetection = true } = props
   const [
     { retryInterval, retryLimit, throttlValue, imageLoadDelay },
@@ -68,23 +71,32 @@ function MangaImage(props: any) {
     visibilityDetection === true ? enable() : disable()
   }, [disable, enable, visibilityDetection])
 
+  useTimeout(
+    () => {
+      setIsActive(true)
+      disable()
+    },
+    isVisible ? imageLoadDelay : null
+  )
+
   /** Start timer when counter container is visbile
    * reset the timer if visibilty changes to invisible
    * disable visibility detection once timer is completed
    */
-  useEffect(() => {
-    let id = -1
 
-    if (isVisible) {
-      id = window.setTimeout(() => {
-        setIsActive(true)
-        disable()
-      }, imageLoadDelay)
-    }
-    return () => {
-      window.clearTimeout(id)
-    }
-  }, [disable, imageLoadDelay, isVisible])
+  // useEffect(() => {
+  //   let id = -1
+
+  //   if (isVisible) {
+  //     id = window.setTimeout(() => {
+  //       setIsActive(true)
+  //       disable()
+  //     }, imageLoadDelay)
+  //   }
+  //   return () => {
+  //     window.clearTimeout(id)
+  //   }
+  // }, [disable, imageLoadDelay, isVisible])
 
   const onImageLoaded = () => {
     if (!ref.current) return
