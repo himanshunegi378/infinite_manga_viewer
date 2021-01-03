@@ -115,9 +115,7 @@ function MangaViewer(props: any) {
             />
           )
         })}
-      <div style={{
-        height:'2000px'
-      }}></div>
+      
       </div>
     </div>
   )
