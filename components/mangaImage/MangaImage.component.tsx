@@ -55,7 +55,12 @@ function reducer(state: ControlState, action: Action): ControlState {
   }
 }
 
-function MangaImage(props: any): ReactElement {
+type Props = {
+  imageLink: string
+  visibilityDetection: boolean
+}
+
+function MangaImage(props: Props): ReactElement {
   const { imageLink, visibilityDetection = true } = props
   const [
     { retryInterval, retryLimit, throttlValue, imageLoadDelay },
@@ -110,7 +115,7 @@ function MangaImage(props: any): ReactElement {
         height: '500px'
       }}>
       {err ? (
-        <div className=" flex flex-wrap justify-center content-center h-full">
+        <div className="flex flex-wrap justify-center content-center h-full">
           <button
             className="bg-blue-500 px-4 py-2 rounded-md font-semibold text-lg text-white"
             onClick={retry}>

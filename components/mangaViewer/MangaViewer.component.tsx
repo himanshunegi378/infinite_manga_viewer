@@ -8,9 +8,7 @@ const fetchChapterInfo = async (link: string): Promise<any> => {
   try {
     const response = await Axios({
       method: 'GET',
-      url: process.env.NEXT_PUBLIC_BACKEND_URL.concat(
-        '/api/chapterImageList'
-      ).concat(`/${encodeURIComponent(link)}`)
+      url: '/api/chapterImageList'.concat(`/${encodeURIComponent(link)}`)
     })
     const responseData = response.data
     if (responseData.status === 1) {
@@ -89,7 +87,7 @@ function MangaViewer(props: any) {
         changeCurentChapterUrlInRoute.current(chapterUrl)
       }
     },
-    [],
+    []
   )
 
   return (
