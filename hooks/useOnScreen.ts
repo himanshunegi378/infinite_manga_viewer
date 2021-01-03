@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from 'react'
 import { fromEvent, interval } from 'rxjs'
@@ -28,10 +29,11 @@ const checkVisbility = (element: HTMLElement, offset: number): boolean => {
 export default function useOnScreen(
   ref: RefObject<HTMLElement>,
   offset = 0,
-  updateInterval = 100
-): [boolean, () => void, () => void] {
+  updateInterval = 100,
+  isEnabled = true
+): [boolean] {
   const [isVisible, setIsVisible] = useState(false)
-  const [isDisabled, setIsDisabled] = useState(false)
+  // const [isDisabled, setIsDisabled] = useState(false)
 
   const observable = useMemo(
     () =>
@@ -59,6 +61,14 @@ export default function useOnScreen(
   const [subscribe, unsubscribe] = useObservable(observable, observer)
 
   useEffect(() => {
+    if (isEnabled) {
+      subscribe()
+    } else {
+      unsubscribe()
+    }
+  }, [isEnabled, subscribe, unsubscribe])
+
+  useEffect(() => {
     if (checkVisbility(ref.current, offset)) {
       setIsVisible(true)
     } else {
@@ -66,21 +76,61 @@ export default function useOnScreen(
     }
   }, [offset, ref])
 
-  useEffect(() => {
-    if (isDisabled) {
-      unsubscribe()
-    } else {
-      subscribe
-    }
-  }, [isDisabled, subscribe, unsubscribe])
-
-  const disable = useCallback((): void => {
-    setIsDisabled(true)
-  }, [])
-
-  const enable = useCallback((): void => {
-    setIsDisabled(false)
-  }, [])
-
-  return [isVisible, disable, enable]
+  return [isVisible]
 }
+
+function useOnscreenEffect(
+  cb: () => void,
+  ref: RefObject<HTMLElement>,
+  updateInterval = 100,
+  offset = 0,
+  isEnabled = true
+): void {
+  const [isVisible, setIsVisible] = useState(false)
+  const cbRef = useRef<() => void>()
+
+  const observable = useMemo(
+    () =>
+      fromEvent(window, 'scroll').pipe(
+        throttle(() => interval(updateInterval))
+      ),
+    [updateInterval]
+  )
+
+  const observer = useCallback(() => {
+    if (!ref.current) {
+      return
+    }
+    if (checkVisbility(ref.current, offset)) {
+      if (!isVisible) {
+        setIsVisible(true)
+      }
+    } else {
+      if (isVisible) {
+        setIsVisible(false)
+      }
+    }
+  }, [isVisible, offset, ref])
+
+  const [subscribe, unsubscribe] = useObservable(observable, observer)
+
+  useEffect(() => {
+    cbRef.current = cb
+  }, [cb])
+
+  useEffect(() => {
+    if (isEnabled) {
+      subscribe()
+    } else {
+      unsubscribe()
+    }
+  }, [isEnabled, subscribe, unsubscribe])
+
+  useEffect(() => {
+    if (isVisible && isEnabled) {
+      cbRef.current()
+    }
+  }, [isEnabled, isVisible])
+}
+
+export { useOnscreenEffect }

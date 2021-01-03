@@ -10,7 +10,7 @@ import React, {
   useState
 } from 'react'
 import useEffectDebugger from '../../hooks/useEffectDebug'
-import useOnScreen from '../../hooks/useOnScreen'
+import useOnScreen, { useOnscreenEffect } from '../../hooks/useOnScreen'
 import useTimeout from '../../hooks/useTimeout'
 
 const initialControlState: ControlState = {
@@ -71,18 +71,20 @@ function MangaImage(props: Props): ReactElement {
   const NoOfTimesRetried = useRef(0)
   const ref = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
-  const [isVisible, disable, enable] = useOnScreen(ref, 100, throttlValue)
+  const [isVisible] = useOnScreen(ref, 100, throttlValue, visibilityDetection)
 
-  useEffect(() => {
-    visibilityDetection === true ? enable() : disable()
-  }, [disable, enable, visibilityDetection])
+  // useEffect(() => {
+  //   visibilityDetection === true ? enable() : disable()
+  // }, [disable, enable, visibilityDetection])
 
   const onVisible = useCallback(() => {
     setIsActive(true)
-    disable()
-  }, [disable])
+  }, [])
 
-  useTimeout(onVisible, isVisible ? imageLoadDelay : null)
+  useTimeout(
+    onVisible,
+    isVisible && visibilityDetection ? imageLoadDelay : null
+  )
 
   const onImageLoaded = () => {
     if (!ref.current) return
