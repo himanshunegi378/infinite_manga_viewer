@@ -63,7 +63,7 @@ function MangaViewer(props: any) {
     })
   }, [initialLink])
 
-  const onChapterFinished = useCallback(async () => {
+  const onChapterFinished = useCallback(async (): Promise<boolean> => {
     if (!nextChapterLink) return true
 
     const { code, data } = await fetchChapterInfo(nextChapterLink)
@@ -106,16 +106,14 @@ function MangaViewer(props: any) {
         {chapterInfoList.map(({ chapterUrl, imagesUrl }, index: number) => {
           return (
             <MangaChapter
+              key={index}
               onChapterFinished={onChapterFinished}
               chapterUrl={chapterUrl}
-              onVisiblityChange={(visibilitySatus: boolean) =>
+              chapterImagesUrl={imagesUrl}
+              onVisibilityChange={(visibilitySatus: boolean) =>
                 visibilityHandle(visibilitySatus, chapterUrl)
               }
-              key={index}>
-              {imagesUrl.map((url, index) => (
-                <MangaImage key={index} imageLink={url} />
-              ))}
-            </MangaChapter>
+            />
           )
         })}
       </div>

@@ -9,9 +9,16 @@ import React, {
 import useEffectDebugger from '../../hooks/useEffectDebug'
 import useOnScreen from '../../hooks/useOnScreen'
 import useVisibilityPercent from '../../hooks/useVisbilityPercent'
+import MangaImage from '../mangaImage/MangaImage.component'
 
-function MangaChapter(props: any): ReactElement {
-  const { onChapterFinished = () => {}, onVisiblityChange } = props
+type Props = {
+  onChapterFinished: () => Promise<boolean>
+  onVisibilityChange: (arg0: boolean) => void
+  chapterUrl: string
+  chapterImagesUrl: string[]
+}
+function MangaChapter(props: Props): ReactElement {
+  const { onChapterFinished, onVisibilityChange, chapterImagesUrl = [] } = props
   const isActive = useRef(true)
   const isLoading = useRef(false)
   const nextChapterRef = useRef<HTMLDivElement>(null)
@@ -32,22 +39,22 @@ function MangaChapter(props: any): ReactElement {
     if (visbilityPercetage > 80) {
       if (!isAlreadyVisible.current) {
         isAlreadyVisible.current = true
-        onVisiblityChange(isAlreadyVisible.current)
+        onVisibilityChange(isAlreadyVisible.current)
       }
     } else {
       if (isAlreadyVisible.current) {
         isAlreadyVisible.current = false
-        onVisiblityChange(isAlreadyVisible.current)
+        onVisibilityChange(isAlreadyVisible.current)
       }
     }
-  }, [onVisiblityChange, visbilityPercetage])
+  }, [onVisibilityChange, visbilityPercetage])
 
   const nextChapterLoadCommand = useCallback(async () => {
     if (!isActive.current) return
     if (isLoading.current) return
 
     isLoading.current = true
-    const isDone = await onChapterFinished()
+    const isDone: boolean = await onChapterFinished()
     if (isDone) {
       isActive.current = false
     }
@@ -69,7 +76,9 @@ function MangaChapter(props: any): ReactElement {
 
   return (
     <div ref={outerRef}>
-      {props.children}
+      {chapterImagesUrl.map((url, index) => (
+        <MangaImage key={index} imageLink={url} visibilityDetection={true} />
+      ))}
       <div
         className="text-center"
         ref={nextChapterRef}
