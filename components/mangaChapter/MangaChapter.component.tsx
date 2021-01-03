@@ -16,25 +16,29 @@ type Props = {
   onVisibilityChange: (arg0: boolean) => void
   chapterUrl: string
   chapterImagesUrl: string[]
+  // dormant: boolean
 }
 function MangaChapter(props: Props): ReactElement {
   const { onChapterFinished, onVisibilityChange, chapterImagesUrl = [] } = props
-  const isActive = useRef(true)
+  const [isNextChapterLoadCommandSentSuccessfully,setIsNextChapterLoadCommandSentSuccessfully] = useState(false)
   const isLoading = useRef(false)
-  const nextChapterRef = useRef<HTMLDivElement>(null)
-  const outerRef = useRef<HTMLDivElement>(null)
+  const nextChapterButtonRef = useRef<HTMLDivElement>(null)
+  const chpaterContainerElementRef = useRef<HTMLDivElement>(null)
   const isAlreadyVisible = useRef(false)
   const [isVisible] = useOnScreen(
-    nextChapterRef,
+    nextChapterButtonRef,
     600,
     100,
-    isActive.current ? true : false
+    isNextChapterLoadCommandSentSuccessfully ? false : true
   )
   const [
     visbilityPercetage,
     disableVisibiltyPercentageTracker
-  ] = useVisibilityPercent(outerRef)
+  ] = useVisibilityPercent(chpaterContainerElementRef)
 
+  /**
+   * Emit current visibilty Status
+   */
   useEffect(() => {
     if (visbilityPercetage > 80) {
       if (!isAlreadyVisible.current) {
@@ -49,24 +53,34 @@ function MangaChapter(props: Props): ReactElement {
     }
   }, [onVisibilityChange, visbilityPercetage])
 
+  /**
+   * Load next chapter and make sure
+   * only one request is made at a time
+   */
   const nextChapterLoadCommand = useCallback(async () => {
-    if (!isActive.current) return
+    if (isNextChapterLoadCommandSentSuccessfully) return
     if (isLoading.current) return
 
     isLoading.current = true
     const isDone: boolean = await onChapterFinished()
     if (isDone) {
-      isActive.current = false
+      setIsNextChapterLoadCommandSentSuccessfully(true)
     }
     isLoading.current = false
-  }, [onChapterFinished])
+  }, [onChapterFinished,isNextChapterLoadCommandSentSuccessfully])
 
+  /**
+   * When chapter Become visible load the next chapter
+   */
   useEffect(() => {
     if (isVisible) {
       nextChapterLoadCommand()
     }
   }, [isVisible, nextChapterLoadCommand])
 
+  /**
+   * To load next chapter by button click
+   */
   const nextChapterButtonClicked = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       nextChapterLoadCommand()
@@ -75,13 +89,17 @@ function MangaChapter(props: Props): ReactElement {
   )
 
   return (
-    <div ref={outerRef}>
+    <div ref={chpaterContainerElementRef}>
       {chapterImagesUrl.map((url, index) => (
-        <MangaImage key={index} imageLink={url} visibilityDetection={true} />
+        <MangaImage
+          key={index}
+          imageLink={url}
+          visibilityDetection={visbilityPercetage > 0 ? true : false}
+        />
       ))}
       <div
         className="text-center"
-        ref={nextChapterRef}
+        ref={nextChapterButtonRef}
         style={{
           fontSize: '2rem',
           padding: '1rem'

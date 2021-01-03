@@ -38,7 +38,7 @@ export default function useOnScreen(
   const observable = useMemo(
     () =>
       fromEvent(window, 'scroll').pipe(
-        throttle(() => interval(updateInterval))
+        throttle(() => interval(updateInterval), { trailing: true })
       ),
     [updateInterval]
   )
@@ -58,15 +58,15 @@ export default function useOnScreen(
     }
   }, [isVisible, offset, ref])
 
-  const [subscribe, unsubscribe] = useObservable(observable, observer)
+  const [subscribe, unsubscribe] = useObservable(observable, observer,{isEnabled:isEnabled})
 
-  useEffect(() => {
-    if (isEnabled) {
-      subscribe()
-    } else {
-      unsubscribe()
-    }
-  }, [isEnabled, subscribe, unsubscribe])
+  // useEffect(() => {
+  //   if (isEnabled) {
+  //     subscribe()
+  //   } else {
+  //     unsubscribe()
+  //   }
+  // }, [isEnabled, subscribe, unsubscribe])
 
   useEffect(() => {
     if (checkVisbility(ref.current, offset)) {
@@ -92,7 +92,7 @@ function useOnscreenEffect(
   const observable = useMemo(
     () =>
       fromEvent(window, 'scroll').pipe(
-        throttle(() => interval(updateInterval))
+        throttle(() => interval(updateInterval), { trailing: true })
       ),
     [updateInterval]
   )

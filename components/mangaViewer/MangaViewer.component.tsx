@@ -98,7 +98,6 @@ function MangaViewer(props: any) {
       <div
         className="shadow-md width-full max-w-xl"
         style={{
-          //   maxWidth: "720px",
           marginLeft: 'auto',
           marginRight: 'auto',
           border: '1px solid #e5e5e5'
@@ -116,6 +115,9 @@ function MangaViewer(props: any) {
             />
           )
         })}
+      <div style={{
+        height:'2000px'
+      }}></div>
       </div>
     </div>
   )

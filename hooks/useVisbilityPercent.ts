@@ -9,12 +9,12 @@ export default function useVisibilityPercent(
   updateInterval = 100
 ): [number, () => void, () => void] {
   const [visiblePercent, setVisiblePercent] = useState(0)
-  const [isDisabled, setIsDisabled] = useState(false)
+  const [isEnabled, setIsEnabled] = useState(true)
 
   const observable = useMemo(
     () =>
       fromEvent(window, 'scroll').pipe(
-        throttle(() => interval(updateInterval))
+        throttle(() => interval(updateInterval), { trailing: true })
       ),
     [updateInterval]
   )
@@ -33,15 +33,17 @@ export default function useVisibilityPercent(
     setVisiblePercent(visibilityPercentage)
   }, [ref])
 
-  const [subscribe, unsubscribe] = useObservable(observable, observer)
+  const [subscribe, unsubscribe] = useObservable(observable, observer, {
+    isEnabled: isEnabled
+  })
 
-  useEffect(() => {
-    if (isDisabled) {
-      unsubscribe()
-    } else {
-      subscribe()
-    }
-  }, [isDisabled, subscribe, unsubscribe])
+  // useEffect(() => {
+  //   if (isEnabled) {
+  //     subscribe()
+  //   } else {
+  //     unsubscribe()
+  //   }
+  // }, [isEnabled, subscribe, unsubscribe])
 
   useEffect(() => {
     if (!ref.current) return
@@ -57,11 +59,11 @@ export default function useVisibilityPercent(
   }, [ref])
 
   const disable = useCallback((): void => {
-    setIsDisabled(true)
+    setIsEnabled(false)
   }, [])
 
   const enable = useCallback((): void => {
-    setIsDisabled(false)
+    setIsEnabled(true)
   }, [])
 
   return [visiblePercent, disable, enable]

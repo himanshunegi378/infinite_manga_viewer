@@ -66,7 +66,7 @@ function MangaImage(props: Props): ReactElement {
     { retryInterval, retryLimit, throttlValue, imageLoadDelay },
     dispatch
   ] = useReducer(reducer, initialControlState)
-  const [isActive, setIsActive] = useState(false)
+  const [isImageReadyToLoad, setIsImageReadyToLoad] = useState(false)
   const [err, setErr] = useState(false)
   const NoOfTimesRetried = useRef(0)
   const ref = useRef<HTMLDivElement>(null)
@@ -78,7 +78,7 @@ function MangaImage(props: Props): ReactElement {
   // }, [disable, enable, visibilityDetection])
 
   const onVisible = useCallback(() => {
-    setIsActive(true)
+    setIsImageReadyToLoad(true)
   }, [])
 
   useTimeout(
@@ -125,7 +125,7 @@ function MangaImage(props: Props): ReactElement {
           </button>
         </div>
       ) : null}
-      {isActive ? (
+      {isImageReadyToLoad ? (
         <img
           ref={imageRef}
           data-testid="mangaImage"
