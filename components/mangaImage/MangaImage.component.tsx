@@ -71,7 +71,7 @@ function MangaImage(props: Props): ReactElement {
   const NoOfTimesRetried = useRef(0)
   const ref = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
-  const [isVisible] = useOnScreen(ref, 100, throttlValue, visibilityDetection)
+  const [isVisible] = useOnScreen(ref, 1000, throttlValue, visibilityDetection)
 
   // useEffect(() => {
   //   visibilityDetection === true ? enable() : disable()
