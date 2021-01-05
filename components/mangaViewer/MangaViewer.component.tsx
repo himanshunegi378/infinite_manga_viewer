@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { ReactElement, useCallback, useEffect, useRef, useState } from 'react'
 import MangaChapter from '../mangaChapter/MangaChapter.component'
 import { useRouter } from 'next/router'
 import MangaImage from '../mangaImage/MangaImage.component'
@@ -26,7 +26,11 @@ const fetchChapterInfo = async (link: string): Promise<any> => {
   }
 }
 
-function MangaViewer(props: any) {
+type Props = {
+  initialLink:string;
+}
+
+function MangaViewer(props: Props):ReactElement {
   const router = useRouter()
 
   const { initialLink = '' } = props

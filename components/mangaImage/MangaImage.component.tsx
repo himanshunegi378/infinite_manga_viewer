@@ -73,10 +73,6 @@ function MangaImage(props: Props): ReactElement {
   const imageRef = useRef<HTMLImageElement>(null)
   const [isVisible] = useOnScreen(ref, 100, throttlValue, visibilityDetection)
 
-  // useEffect(() => {
-  //   visibilityDetection === true ? enable() : disable()
-  // }, [disable, enable, visibilityDetection])
-
   const onVisible = useCallback(() => {
     setIsImageReadyToLoad(true)
   }, [])

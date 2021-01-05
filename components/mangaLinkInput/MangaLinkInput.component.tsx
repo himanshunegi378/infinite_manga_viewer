@@ -1,5 +1,6 @@
 import React, {
   FormEvent,
+  ReactElement,
   useCallback,
   useEffect,
   useRef,
@@ -7,8 +8,12 @@ import React, {
 } from 'react'
 import { fromEvent, Observable } from 'rxjs'
 
-function MangaLinkInput(props: any) {
-  const { onLinkSubmitted = () => {} } = props
+type Props = {
+  onLinkSubmit: (arg0: string) => void
+}
+
+function MangaLinkInput(props: Props): ReactElement {
+  const { onLinkSubmit = () => {} } = props
   const [link, setLink] = useState('')
   const previousScrllTopRef = useRef(0)
   const hideableSearchBoxRef = useRef(null)
@@ -24,20 +29,7 @@ function MangaLinkInput(props: any) {
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!link) return
-    onLinkSubmitted(link)
-  }
-
-  function getDocHeight() {
-    const D = document
-    return Math.max(
-      D.body.scrollHeight,
-      D.documentElement.scrollHeight,
-      D.body.offsetHeight,
-      D.documentElement.offsetHeight,
-      D.body.clientHeight,
-      D.documentElement.clientHeight
-    )
+    onLinkSubmit(link)
   }
 
   const isNegative = (num: number) => {
@@ -56,7 +48,6 @@ function MangaLinkInput(props: any) {
       if (!innerHideableSearchBoxRef.current) {
         return
       }
-      //@ts-ignore
       const searchBoxHeight = innerHideableSearchBoxRef.current.getBoundingClientRect()
         .height
       if (isNegative(offset)) {
@@ -79,10 +70,6 @@ function MangaLinkInput(props: any) {
   )
 
   const amountScrolled = useCallback(() => {
-    // const winheight =
-    //   window.innerHeight ||
-    //   (document.documentElement || document.body).clientHeight
-    // const docheight = getDocHeight()
     const scrollTop =
       window.pageYOffset ||
       (
@@ -90,8 +77,6 @@ function MangaLinkInput(props: any) {
         (document.body.parentNode as HTMLElement) ||
         document.body
       ).scrollTop
-    // const trackLength = docheight - winheight
-    // const pctScrolled = Math.floor((scrollTop / trackLength) * 100) // gets percentage scrolled (ie: 80 or NaN if tracklength == 0)
     const diff = scrollTop - previousScrllTopRef.current
     previousScrllTopRef.current = scrollTop
     moveSearchBox(hideableSearchBoxRef.current, diff)
