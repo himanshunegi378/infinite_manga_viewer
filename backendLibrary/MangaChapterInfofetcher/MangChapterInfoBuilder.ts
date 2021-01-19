@@ -12,6 +12,7 @@ export default abstract class MangaChapterInfoBuilder {
   abstract fetchPage(): Promise<any>
   abstract extractImageLinks(): Promise<any>
   abstract extractTitle(): Promise<any>
+  abstract extractMangaName(): Promise<any>
   abstract extractNextChapteLink(): Promise<any>
 
   show(): MangaChapterInfo {

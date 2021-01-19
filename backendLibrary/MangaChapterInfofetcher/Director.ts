@@ -6,6 +6,7 @@ export default class MangaImageFetcherDirector {
     await builder.extractImageLinks()
     await builder.extractTitle()
     await builder.extractNextChapteLink()
+    await builder.extractMangaName()
     return builder
   }
 }

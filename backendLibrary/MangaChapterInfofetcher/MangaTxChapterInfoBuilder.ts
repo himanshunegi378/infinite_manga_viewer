@@ -58,7 +58,19 @@ export default class MangaTxChapterInfoBuilder extends MangaChapterInfoBuilder {
       const chapterTitle: string = this.$('#chapter-heading').first().text()
       this.mangaChapterInfo.chapterTitle = chapterTitle
     } catch (error) {
-      throw new Error('Error Extracting Title ' + error)
+      throw new Error('Error Extracting chapter Title ' + error)
+    }
+    return this
+  }
+  async extractMangaName(): Promise<MangaTxChapterInfoBuilder> {
+    try {
+      const mangaTitle: any = this.$('.breadcrumb a')
+        .get(1)
+        .children[0].data.trim()
+
+      this.mangaChapterInfo.mangaTitle = mangaTitle
+    } catch (error) {
+      throw new Error('Error Extracting Manga Title ' + error)
     }
     return this
   }

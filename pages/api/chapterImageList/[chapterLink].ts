@@ -26,7 +26,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       payload: {
         imageList: mangaChapterInfo.chapterImagesURL,
         nextChapterLink: mangaChapterInfo.nextChapterURL,
-        title: mangaChapterInfo.chapterTitle
+        chapterTitle: mangaChapterInfo.chapterTitle,
+        mangaTitle: mangaChapterInfo.mangaTitle
       }
     })
   } catch (error) {
