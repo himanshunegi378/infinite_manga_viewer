@@ -2,6 +2,7 @@ export default class MangaChapterInfo {
   private _chapterImagesURL: string[]
   private _nextChapterURL: string
   private _chapterTitle: string
+  private _mangaTitle: string
 
   public get chapterImagesURL(): string[] {
     return this._chapterImagesURL
@@ -25,6 +26,14 @@ export default class MangaChapterInfo {
 
   public set chapterTitle(value: string) {
     this._chapterTitle = value
+  }
+
+  public get mangaTitle(): string {
+    return this._mangaTitle
+  }
+
+  public set mangaTitle(value: string) {
+    this._mangaTitle = value
   }
   constructor(linkList: string[]) {
     this.chapterImagesURL = linkList

@@ -1,7 +1,14 @@
 import Axios from 'axios'
-import React, { ReactElement, useCallback, useEffect, useRef, useState } from 'react'
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 import MangaChapter from '../mangaChapter/MangaChapter.component'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 import MangaImage from '../mangaImage/MangaImage.component'
 
 const fetchChapterInfo = async (link: string): Promise<any> => {
@@ -27,10 +34,10 @@ const fetchChapterInfo = async (link: string): Promise<any> => {
 }
 
 type Props = {
-  initialLink:string;
+  initialLink: string
 }
 
-function MangaViewer(props: Props):ReactElement {
+function MangaViewer(props: Props): ReactElement {
   const router = useRouter()
 
   const { initialLink = '' } = props
@@ -41,6 +48,8 @@ function MangaViewer(props: Props):ReactElement {
   const currentChapterLink = useRef<string>('')
 
   const changeCurentChapterUrlInRoute = useRef(null)
+  const mangaTitle = useRef('')
+  const [currentChapterName, setCurrentChapterName] = useState('')
 
   useEffect(() => {
     changeCurentChapterUrlInRoute.current = (chapterUrl: string) => {
@@ -58,6 +67,8 @@ function MangaViewer(props: Props):ReactElement {
       const { code, data } = info
       if (code === 'CHAPTER') {
         window.scrollTo({ top: 0, behavior: 'smooth' })
+        mangaTitle.current = data.mangaTitle
+        setCurrentChapterName(data.chapterTitle)
         setChapterInfoList([
           { chapterUrl: initialLink, imagesUrl: data.imageList }
         ])
@@ -72,6 +83,7 @@ function MangaViewer(props: Props):ReactElement {
 
     const { code, data } = await fetchChapterInfo(nextChapterLink)
     if (code === 'CHAPTER') {
+      setCurrentChapterName(data.chapterTitle)
       setChapterInfoList(prevState => [
         ...prevState,
         { chapterUrl: nextChapterLink, imagesUrl: data.imageList }
@@ -99,6 +111,9 @@ function MangaViewer(props: Props):ReactElement {
       style={{
         backgroundColor: ''
       }}>
+      <Head>
+        <title>{currentChapterName}</title>
+      </Head>
       <div
         className="shadow-md width-full max-w-xl"
         style={{
@@ -119,9 +134,10 @@ function MangaViewer(props: Props):ReactElement {
             />
           )
         })}
-      <div style={{
-        height:'2000px'
-      }}></div>
+        <div
+          style={{
+            height: '2000px'
+          }}></div>
       </div>
     </div>
   )
