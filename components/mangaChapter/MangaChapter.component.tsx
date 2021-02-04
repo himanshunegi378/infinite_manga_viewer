@@ -20,14 +20,14 @@ type Props = {
 }
 function MangaChapter(props: Props): ReactElement {
   const { onChapterFinished, onVisibilityChange, chapterImagesUrl = [] } = props
-  const [isNextChapterLoadCommandSentSuccessfully,setIsNextChapterLoadCommandSentSuccessfully] = useState(false)
+  const [isNextChapterLoadCommandSentSuccessfully, setIsNextChapterLoadCommandSentSuccessfully] = useState(false)
   const isLoading = useRef(false)
   const nextChapterButtonRef = useRef<HTMLDivElement>(null)
   const chpaterContainerElementRef = useRef<HTMLDivElement>(null)
   const isAlreadyVisible = useRef(false)
   const [isVisible] = useOnScreen(
     nextChapterButtonRef,
-    600,
+    window.innerHeight * 4 || 2000,
     100,
     isNextChapterLoadCommandSentSuccessfully ? false : true
   )
@@ -67,7 +67,7 @@ function MangaChapter(props: Props): ReactElement {
       setIsNextChapterLoadCommandSentSuccessfully(true)
     }
     isLoading.current = false
-  }, [onChapterFinished,isNextChapterLoadCommandSentSuccessfully])
+  }, [onChapterFinished, isNextChapterLoadCommandSentSuccessfully])
 
   /**
    * When chapter Become visible load the next chapter
