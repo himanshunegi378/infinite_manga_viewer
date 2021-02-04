@@ -27,7 +27,7 @@ function MangaChapter(props: Props): ReactElement {
   const isAlreadyVisible = useRef(false)
   const [isVisible] = useOnScreen(
     nextChapterButtonRef,
-    window.innerHeight * 4 || 2000,
+    window.innerHeight * 4 || 2001,
     100,
     isNextChapterLoadCommandSentSuccessfully ? false : true
   )
