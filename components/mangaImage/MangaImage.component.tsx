@@ -71,7 +71,7 @@ function MangaImage(props: Props): ReactElement {
   const NoOfTimesRetried = useRef(0)
   const ref = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
-  const [isVisible] = useOnScreen(ref, 1000, throttlValue, visibilityDetection)
+  const [isVisible] = useOnScreen(ref, window.innerHeight * 4 || 2000, throttlValue, visibilityDetection)
 
   const onVisible = useCallback(() => {
     setIsImageReadyToLoad(true)
@@ -137,13 +137,13 @@ function MangaImage(props: Props): ReactElement {
           alt="l"
         />
       ) : (
-        <img
-          data-testid="fallbackImage"
-          src="/loading.gif"
-          width="128"
-          height="128"
-        />
-      )}
+          <img
+            data-testid="fallbackImage"
+            src="/loading.gif"
+            width="128"
+            height="128"
+          />
+        )}
     </div>
   )
 }
