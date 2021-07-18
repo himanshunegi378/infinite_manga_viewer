@@ -12,11 +12,13 @@
     "coverage": "jest --collect-coverage"
   },
   "dependencies": {
+    "@types/psl": "^1.1.0",
     "autoprefixer": "^10.1.0",
     "axios": "^0.21.0",
     "cheerio": "^1.0.0-rc.3",
     "next": "10.0.3",
     "postcss": "^8.2.1",
+    "psl": "^1.8.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-smooth-scrolling": "^1.0.2",
